@@ -3,6 +3,9 @@ export default {
     GAME_HEIGHT: window.innerHeight,
     PIXEL_SIZE: 10, // Defines the size of pixels used to generate PIXEL_SPRITES
 
+    FLOOR_Y: window.innerHeight * 0.50,
+    FLOOR_HEIGHT: window.innerHeight * 0.3,
+
     SPRITESHEETS: {
         '_test_spritesheet': {
             key: 'test_spritesheet',

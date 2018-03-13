@@ -19,5 +19,15 @@ export default {
 		}
 
 		return game.create.texture(null, dialog, Defs.PIXEL_SIZE, Defs.PIXEL_SIZE, 0, false);
+	},
+
+	// Should only be used in a preload method because generating an image and adding to cache is async
+	CreateDummySprite: (name, w, h, color="#FFFFFF") => {
+		let bmd = game.add.bitmapData(w, h);
+		bmd.ctx.beginPath();
+		bmd.ctx.rect(0, 0, w, h);
+		bmd.ctx.fillStyle = color;
+		bmd.ctx.fill();
+		game.load.imageFromBitmapData(name, bmd);
 	}
 };

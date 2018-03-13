@@ -69,15 +69,15 @@
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_expose_loader_PIXI_phaser_ce_build_custom_pixi_js__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_expose_loader_PIXI_phaser_ce_build_custom_pixi_js__ = __webpack_require__(5);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_expose_loader_PIXI_phaser_ce_build_custom_pixi_js___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_expose_loader_PIXI_phaser_ce_build_custom_pixi_js__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_expose_loader_p2_phaser_ce_build_custom_p2_js__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_expose_loader_p2_phaser_ce_build_custom_p2_js__ = __webpack_require__(7);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_expose_loader_p2_phaser_ce_build_custom_p2_js___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_expose_loader_p2_phaser_ce_build_custom_p2_js__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_expose_loader_Phaser_phaser_ce_build_custom_phaser_split_js__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_expose_loader_Phaser_phaser_ce_build_custom_phaser_split_js__ = __webpack_require__(9);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_expose_loader_Phaser_phaser_ce_build_custom_phaser_split_js___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_expose_loader_Phaser_phaser_ce_build_custom_phaser_split_js__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__preload__ = __webpack_require__(10);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__main__ = __webpack_require__(11);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__defs__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__preload__ = __webpack_require__(12);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__main__ = __webpack_require__(13);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__defs__ = __webpack_require__(1);
 
 /**
  * Import Phaser dependencies using `expose-loader`.
@@ -103,6 +103,37 @@ game.state.start("Preload");
 
 /***/ }),
 /* 1 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony default export */ __webpack_exports__["a"] = ({
+    GAME_WIDTH: window.innerWidth,
+    GAME_HEIGHT: window.innerHeight,
+    PIXEL_SIZE: 10, // Defines the size of pixels used to generate PIXEL_SPRITES
+
+    FLOOR_Y: window.innerHeight * 0.50,
+    FLOOR_HEIGHT: window.innerHeight * 0.3,
+
+    SPRITESHEETS: {
+        '_test_spritesheet': {
+            key: 'test_spritesheet',
+            frameWidth: 26,
+            frameHeight: 1
+        },
+    },
+
+    SPRITES: {
+        //'player': '../img/player.png',
+    },
+
+    PIXEL_SPRITES: {
+        'test': [ '0123456789................', 'abcefghijklmnopqrstuvwxyz', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' ],
+        '_test_spritesheet': [ '0123456789................' + 'abcdefghijklmnopqrstuvwxyz' + 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' ],
+    }
+});
+
+/***/ }),
+/* 2 */
 /***/ (function(module, exports) {
 
 var g;
@@ -129,42 +160,75 @@ module.exports = g;
 
 
 /***/ }),
-/* 2 */
+/* 3 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony default export */ __webpack_exports__["a"] = ({
-    GAME_WIDTH: window.innerWidth,
-    GAME_HEIGHT: window.innerHeight,
-    PIXEL_SIZE: 10, // Defines the size of pixels used to generate PIXEL_SPRITES
+const State = {
+	coins: 0,
+    inCombat: false,
+    combatTurn: -1,
 
-    SPRITESHEETS: {
-        '_test_spritesheet': {
-            key: 'test_spritesheet',
-            frameWidth: 26,
-            frameHeight: 1
-        },
-    },
+	reset: function() {
+		this.coins = 0;
+	}
+}
 
-    SPRITES: {
-        //'player': '../img/player.png',
-    },
-
-    PIXEL_SPRITES: {
-        'test': [ '0123456789................', 'abcefghijklmnopqrstuvwxyz', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' ],
-        '_test_spritesheet': [ '0123456789................' + 'abcdefghijklmnopqrstuvwxyz' + 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' ],
-    }
-});
-
-/***/ }),
-/* 3 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function(global) {module.exports = global["PIXI"] = __webpack_require__(4);
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
+/* harmony default export */ __webpack_exports__["a"] = (State);
 
 /***/ }),
 /* 4 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game__ = __webpack_require__(0);
+
+
+class Mob {
+    constructor(hp) {
+        this.health = hp;
+    }
+
+    hit() {
+        this.health--;
+        this.sprite.tint = 0xFF9090;
+        setTimeout(() => { // forgive me pls for using a timeout
+            this.sprite.tint = 0xFFFFFF; // reset tint
+        }, 100);
+    }
+
+    attack(mob, onHit) {
+        let targetHealth = mob.health;
+
+        __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.tween(this.sprite).to({
+            x: mob.sprite.x - 100,
+            y: mob.sprite.y
+        }, 500).chain(
+            __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.tween(this.sprite).to({
+                x: this.sprite.x,
+                y: this.sprite.y,
+            }, 500)
+        ).start().onComplete.addOnce(() => {
+            // phaser is being dumb and firing this event multiple times so don't do anything if the target enemy's health has changed
+            if (mob.health !== targetHealth) return;
+
+            mob.hit();
+            onHit();
+        });
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = Mob;
+
+
+/***/ }),
+/* 5 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(global) {module.exports = global["PIXI"] = __webpack_require__(6);
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2)))
+
+/***/ }),
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /**
@@ -7728,14 +7792,14 @@ PIXI.TextureUvs = function()
 }).call(this);
 
 /***/ }),
-/* 5 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
-/* WEBPACK VAR INJECTION */(function(global) {module.exports = global["p2"] = __webpack_require__(6);
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
+/* WEBPACK VAR INJECTION */(function(global) {module.exports = global["p2"] = __webpack_require__(8);
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2)))
 
 /***/ }),
-/* 6 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var require;var require;/**
@@ -21362,14 +21426,14 @@ World.prototype.raycast = function(result, ray){
 
 
 /***/ }),
-/* 7 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
-/* WEBPACK VAR INJECTION */(function(global) {module.exports = global["Phaser"] = __webpack_require__(8);
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
+/* WEBPACK VAR INJECTION */(function(global) {module.exports = global["Phaser"] = __webpack_require__(10);
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2)))
 
 /***/ }),
-/* 8 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(process) {/**
@@ -108136,10 +108200,10 @@ PIXI.canUseNewCanvasBlendModes = function () {
 * "What matters in this life is not what we do but what we do for others, the legacy we leave and the imprint we make." - Eric Meyer
 */
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(9)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(11)))
 
 /***/ }),
-/* 9 */
+/* 11 */
 /***/ (function(module, exports) {
 
 // shim for using process in browser
@@ -108329,12 +108393,12 @@ process.umask = function() { return 0; };
 
 
 /***/ }),
-/* 10 */
+/* 12 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__defs__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__defs__ = __webpack_require__(1);
 
 
 
@@ -108384,49 +108448,327 @@ let loadPromises = [];
 
 
 /***/ }),
-/* 11 */
+/* 13 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__state__ = __webpack_require__(12);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__defs__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__state__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__defs__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__utils__ = __webpack_require__(14);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__player__ = __webpack_require__(15);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__enemy__ = __webpack_require__(16);
 
 
 
+
+
+
+
+const ENEMY_COMBAT_POSITIONS = 5; // number of enemies that can be fought at once
+const COMBAT_ENTRY_RANGE = __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH * 0.4;
+const COMBAT_START_DELAY = 500;
+
+let floorTileSprite;
+let player;
+let enemies;
+let enemiesInCombat;
+let combatDelayTimer;
+let combatKeys;
+let combatKeyTexts;
 
 /* harmony default export */ __webpack_exports__["a"] = ({
     preload: () => {
-
+        // TODO: replace dummy sprites with actual sprites
+        __WEBPACK_IMPORTED_MODULE_3__utils__["a" /* default */].CreateDummySprite('player', 60, 130, "#99CF9A");
+        __WEBPACK_IMPORTED_MODULE_3__utils__["a" /* default */].CreateDummySprite('enemy', 100, 70, "#D5999A");
+        __WEBPACK_IMPORTED_MODULE_3__utils__["a" /* default */].CreateDummySprite('floor', 10, 10, "#604744");
     },
 
     create: () => {
         __WEBPACK_IMPORTED_MODULE_1__state__["a" /* default */].reset();
         
-        __WEBPACK_IMPORTED_MODULE_0__game__["default"].stage.backgroundColor = "#90A0F5";
+        __WEBPACK_IMPORTED_MODULE_0__game__["default"].stage.backgroundColor = "#908077";
+        __WEBPACK_IMPORTED_MODULE_0__game__["default"].world.setBounds(0, 0, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH * 100, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT);
+        floorTileSprite = __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.tileSprite(-50, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].FLOOR_Y, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH + 100, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].FLOOR_HEIGHT, 'floor');
 
-        __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.sprite(0, 0, 'test');
+        //game.add.sprite(0, 0, 'test');
+
+        combatKeys = [
+            __WEBPACK_IMPORTED_MODULE_0__game__["default"].input.keyboard.addKey(Phaser.KeyCode.ONE),
+            __WEBPACK_IMPORTED_MODULE_0__game__["default"].input.keyboard.addKey(Phaser.KeyCode.TWO),
+            __WEBPACK_IMPORTED_MODULE_0__game__["default"].input.keyboard.addKey(Phaser.KeyCode.THREE),
+            __WEBPACK_IMPORTED_MODULE_0__game__["default"].input.keyboard.addKey(Phaser.KeyCode.FOUR),
+            __WEBPACK_IMPORTED_MODULE_0__game__["default"].input.keyboard.addKey(Phaser.KeyCode.FIVE),
+        ];
+
+        player = new __WEBPACK_IMPORTED_MODULE_4__player__["a" /* default */](100, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT * 0.7);
+        enemies = [];
+        enemiesInCombat = new Array(ENEMY_COMBAT_POSITIONS);
+
+        enemies.push(new __WEBPACK_IMPORTED_MODULE_5__enemy__["a" /* default */](__WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH - 500, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT * 0.7));
+        enemies.push(new __WEBPACK_IMPORTED_MODULE_5__enemy__["a" /* default */](__WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH - 600, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT * 0.7 + 50));
+        enemies.push(new __WEBPACK_IMPORTED_MODULE_5__enemy__["a" /* default */](__WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH - 550, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT * 0.7 - 100));
+
+        // add after enemies to keep on top, alternatively create a UI group that appears over top
+        combatKeyTexts = [];
+        for (var i = 0; i < ENEMY_COMBAT_POSITIONS; i++) {
+            var t = __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.text(0, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].FLOOR_Y + (i + 0.5) / ENEMY_COMBAT_POSITIONS * __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].FLOOR_HEIGHT - 100, i + 1);
+            t.visible = false;
+            combatKeyTexts[i] = t;
+        }
     },
 
     update: () => {
+        player.update();
 
+        floorTileSprite.x = __WEBPACK_IMPORTED_MODULE_0__game__["default"].camera.x - 50;
+        floorTileSprite.tilePosition.x = -(__WEBPACK_IMPORTED_MODULE_0__game__["default"].camera.x - 50);
+
+        let enteringCombat = __WEBPACK_IMPORTED_MODULE_1__state__["a" /* default */].inCombat;
+        for (var i = 0; i < enemies.length; i++) {
+            enemies[i].update();
+
+            if (!enteringCombat && Math.abs(enemies[i].sprite.x - player.sprite.x) <= COMBAT_ENTRY_RANGE) {
+                enteringCombat = true;
+            }
+        }
+
+        if (enteringCombat && !__WEBPACK_IMPORTED_MODULE_1__state__["a" /* default */].inCombat) {
+            __WEBPACK_IMPORTED_MODULE_1__state__["a" /* default */].inCombat = true;
+            __WEBPACK_IMPORTED_MODULE_1__state__["a" /* default */].combatTurn = -1; // player's turn
+            combatDelayTimer = COMBAT_START_DELAY;
+            __WEBPACK_IMPORTED_MODULE_0__game__["default"].camera.unfollow();
+
+            // move player to center y
+            __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.tween(player.sprite).to({
+                y: __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].FLOOR_Y + __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].FLOOR_HEIGHT / 2 + player.sprite.height * 0.4
+            }, COMBAT_START_DELAY).start();
+
+            // move all on screen enemies into combat positions
+            for (var i = 0; i < enemies.length; i++) {
+                if (enemies[i].sprite.inCamera) {
+                    let combatPos = -1;
+                    for (var p = 0; p < ENEMY_COMBAT_POSITIONS; p++) {
+                        if (!enemiesInCombat[p]) {
+                            combatPos = p;
+                            enemiesInCombat[p] = enemies[i];
+                            combatKeyTexts[p].position.x = player.sprite.x + COMBAT_ENTRY_RANGE - 50 + p % 2 * 120;
+                            combatKeyTexts[p].visible = true;
+                            break;
+                        }
+                    }
+
+                    if (combatPos === -1) {
+                        // couldn't find an available combat position so move the sprite offscreen
+                        __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.tween(enemies[i].sprite).to({
+                            x: __WEBPACK_IMPORTED_MODULE_0__game__["default"].camera.x + __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH + 200
+                        }, COMBAT_START_DELAY).start();
+                    } else {
+                        // move the sprite into it's combat position
+                        __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.tween(enemies[i].sprite).to({
+                            x: player.sprite.x + COMBAT_ENTRY_RANGE - 50 + combatPos % 2 * 120,
+                            y: __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].FLOOR_Y + (combatPos + 0.5) / ENEMY_COMBAT_POSITIONS * __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].FLOOR_HEIGHT
+                        }, COMBAT_START_DELAY).start();
+                    }
+                }
+            }
+        } else if (__WEBPACK_IMPORTED_MODULE_1__state__["a" /* default */].inCombat && combatDelayTimer <= 0) {
+            let usedTurn = false;
+            if (__WEBPACK_IMPORTED_MODULE_1__state__["a" /* default */].combatTurn === -1) {
+                // player's turn
+                let targetEnemy, targetEnemyPos;
+                let combatOver = true;
+                for (var p = 0; p < ENEMY_COMBAT_POSITIONS; p++) {
+                    if (enemiesInCombat[p]) {
+                        combatOver = false;
+                        if (combatKeys[p].isDown) {
+                            targetEnemyPos = p;
+                            targetEnemy = enemiesInCombat[p];
+                            break;
+                        }
+                    }
+                }
+
+                if (targetEnemy) {
+                    usedTurn = true;
+                    combatDelayTimer = 1000; // delay next attack until animations are done
+
+                    player.attack(targetEnemy, () => {
+                        if (targetEnemy.health <= 0) {
+                            // KILL IT
+                            delete enemiesInCombat[enemiesInCombat.indexOf(targetEnemy)];
+                            enemies.splice(enemies.indexOf(targetEnemy), 1);
+                            targetEnemy.sprite.destroy();
+
+                            // hide combat key text
+                            combatKeyTexts[targetEnemyPos].visible = false;
+                        }
+                    });
+                } else if (combatOver) {
+                    __WEBPACK_IMPORTED_MODULE_0__game__["default"].camera.follow(player.sprite, Phaser.Camera.FOLLOW_PLATFORMER);
+                    __WEBPACK_IMPORTED_MODULE_1__state__["a" /* default */].inCombat = false;
+                }
+            } else {
+                // enemy's turn
+                usedTurn = true;
+                let enemy = enemiesInCombat[__WEBPACK_IMPORTED_MODULE_1__state__["a" /* default */].combatTurn];
+                if (enemy) {
+                    combatDelayTimer = 1000; // delay next attack until animations are done
+                    enemy.attack(player, () => {
+                        if (player.health <= 0) {
+                            console.log("LOSE");
+                        }
+                    });
+                }
+            }
+
+            if (usedTurn) {
+                __WEBPACK_IMPORTED_MODULE_1__state__["a" /* default */].combatTurn++;
+                if (__WEBPACK_IMPORTED_MODULE_1__state__["a" /* default */].combatTurn == ENEMY_COMBAT_POSITIONS) __WEBPACK_IMPORTED_MODULE_1__state__["a" /* default */].combatTurn = -1; // reset to player's turn
+            }
+        } else if (combatDelayTimer > 0) {
+            combatDelayTimer -= __WEBPACK_IMPORTED_MODULE_0__game__["default"].time.elapsed;
+        }
+    },
+
+    render: () => {
+        __WEBPACK_IMPORTED_MODULE_0__game__["default"].debug.text( "InCombat: " + __WEBPACK_IMPORTED_MODULE_1__state__["a" /* default */].inCombat, 100, 100 );
+        __WEBPACK_IMPORTED_MODULE_0__game__["default"].debug.text( "Combat Turn: " + __WEBPACK_IMPORTED_MODULE_1__state__["a" /* default */].combatTurn, 100, 120 );
     }
 });
 
 /***/ }),
-/* 12 */
+/* 14 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-const State = {
-	coins: 0,
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__defs__ = __webpack_require__(1);
 
-	reset: function() {
-		this.coins = 0;
+
+
+/* harmony default export */ __webpack_exports__["a"] = ({
+	CreateDialog: (w, h, r) => {
+		r = r || 2;
+		let dialog = [];
+		for (var y = 0; y < h; y++) {
+			let line = '';
+			for (var x = 0; x < w; x++) {
+				if (x + y < r || w-1 - x + y < r || x + h-1 - y < r || w-1 - x + h-1 - y < r)
+					line += '.';
+				else if (x == 0 || y == 0 || x == w-1 || y == h-1
+					|| x + y == r || w-1 - x + y == r || x + h-1 - y == r || w-1 - x + h-1 - y == r)
+					line += '0';
+				else line += '8'; 
+			}
+			dialog.push(line);
+		}
+
+		return __WEBPACK_IMPORTED_MODULE_0__game__["default"].create.texture(null, dialog, __WEBPACK_IMPORTED_MODULE_1__defs__["a" /* default */].PIXEL_SIZE, __WEBPACK_IMPORTED_MODULE_1__defs__["a" /* default */].PIXEL_SIZE, 0, false);
+	},
+
+	// Should only be used in a preload method because generating an image and adding to cache is async
+	CreateDummySprite: (name, w, h, color="#FFFFFF") => {
+		let bmd = __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.bitmapData(w, h);
+		bmd.ctx.beginPath();
+		bmd.ctx.rect(0, 0, w, h);
+		bmd.ctx.fillStyle = color;
+		bmd.ctx.fill();
+		__WEBPACK_IMPORTED_MODULE_0__game__["default"].load.imageFromBitmapData(name, bmd);
 	}
-}
+});
 
-/* harmony default export */ __webpack_exports__["a"] = (State);
+/***/ }),
+/* 15 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__state__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__mob__ = __webpack_require__(4);
+
+
+
+
+const YSPEED = 1.5;
+const XSPEED = 3;
+
+class Player extends __WEBPACK_IMPORTED_MODULE_2__mob__["a" /* default */] {
+    constructor(x, y) {
+        super(10);
+
+        this.sprite = __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.sprite(x, y, 'player');
+        this.sprite.anchor.set(0.5, 1); // set sprite anchor at feet
+        __WEBPACK_IMPORTED_MODULE_0__game__["default"].camera.follow(this.sprite, Phaser.Camera.FOLLOW_PLATFORMER);
+
+        this.keys = __WEBPACK_IMPORTED_MODULE_0__game__["default"].input.keyboard.createCursorKeys();
+    }
+
+    update() {
+        if (!__WEBPACK_IMPORTED_MODULE_1__state__["a" /* default */].inCombat) {
+            if (this.keys.up.isDown) {
+                this.sprite.y -= YSPEED;
+            }
+
+            if (this.keys.down.isDown) {
+                this.sprite.y += YSPEED;
+            }
+
+            if (this.keys.left.isDown) {
+                this.sprite.x -= XSPEED;
+            }
+
+            if (this.keys.right.isDown) {
+                this.sprite.x += XSPEED;
+            }
+        }
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = Player;
+
+
+/***/ }),
+/* 16 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__state__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__mob__ = __webpack_require__(4);
+
+
+
+
+const YSPEED = 1.5;
+const XSPEED = 3;
+
+class Enemy extends __WEBPACK_IMPORTED_MODULE_2__mob__["a" /* default */] {
+    constructor(x, y) {
+        super(3)
+
+        this.sprite = __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.sprite(x, y, 'enemy');
+        this.sprite.anchor.set(0.5, 1);
+    }
+
+    update() {
+        if (!__WEBPACK_IMPORTED_MODULE_1__state__["a" /* default */].inCombat) {
+            // random walk, add direction choice delay
+            // let rd = ~~(Math.random() * 10);
+            // if (rd == 0) {
+            //     this.sprite.x -= XSPEED;
+            // } else if (rd == 1) {
+            //     this.sprite.x += XSPEED;
+            // } else if (rd == 2) {
+            //     this.sprite.y += YSPEED;
+            // } else if (rd == 3) {
+            //     this.sprite.y -= YSPEED;
+            // }
+        }
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = Enemy;
+
 
 /***/ })
 /******/ ]);

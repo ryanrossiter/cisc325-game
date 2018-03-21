@@ -4,8 +4,9 @@ import Defs from './defs';
 import Utils from './utils';
 import Player from './player';
 import Enemy from './enemy';
+import LootNavigator from './lootnavigator';
 
-const ENEMY_COMBAT_POSITIONS = 5; // number of enemies that can be fought at once
+const ENEMY_COMBAT_POSITIONS = 3; // number of enemies that can be fought at once
 const COMBAT_ENTRY_RANGE = Defs.GAME_WIDTH * 0.4;
 const COMBAT_START_DELAY = 500;
 
@@ -23,6 +24,9 @@ export default {
         Utils.CreateDummySprite('player', 60, 130, "#99CF9A");
         Utils.CreateDummySprite('enemy', 100, 70, "#D5999A");
         Utils.CreateDummySprite('floor', 10, 10, "#604744");
+        Utils.CreateDummySprite('item', 70, 70, "#44764A");
+
+        Utils.CreateDummySprite('blank', 10, 10, "#FFFFFF");
     },
 
     create: () => {
@@ -46,9 +50,9 @@ export default {
         enemies = [];
         enemiesInCombat = new Array(ENEMY_COMBAT_POSITIONS);
 
-        enemies.push(new Enemy(Defs.GAME_WIDTH - 500, Defs.GAME_HEIGHT * 0.7));
-        enemies.push(new Enemy(Defs.GAME_WIDTH - 600, Defs.GAME_HEIGHT * 0.7 + 50));
-        enemies.push(new Enemy(Defs.GAME_WIDTH - 550, Defs.GAME_HEIGHT * 0.7 - 100));
+        enemies.push(new Enemy(Defs.GAME_WIDTH - 500, Defs.GAME_HEIGHT * 0.7, 0));
+        enemies.push(new Enemy(Defs.GAME_WIDTH - 600, Defs.GAME_HEIGHT * 0.7 + 50, 0));
+        enemies.push(new Enemy(Defs.GAME_WIDTH - 550, Defs.GAME_HEIGHT * 0.7 - 100, 0));
 
         // add after enemies to keep on top, alternatively create a UI group that appears over top
         combatKeyTexts = [];
@@ -57,6 +61,8 @@ export default {
             t.visible = false;
             combatKeyTexts[i] = t;
         }
+
+        new LootNavigator(Defs.GAME_WIDTH - 300, 100);
     },
 
     update: () => {

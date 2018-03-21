@@ -1,12 +1,20 @@
 import game from './game';
 
+const HEALTH_BAR_WIDTH = 70;
+
 export default class Mob {
     constructor(hp) {
-        this.health = hp;
+        this.maxHealth = this.health = hp;
+
+        this.healthBar = game.add.group(null);
+        this._healthBar = this.healthBar.add(new Phaser.Sprite(game, -HEALTH_BAR_WIDTH / 2, 10, 'blank'));
+        this._healthBar.width = HEALTH_BAR_WIDTH;
+        this._healthBar.tint = 0xFF0000;
     }
 
     hit() {
         this.health--;
+        this._healthBar.width = HEALTH_BAR_WIDTH * Math.max(this.health / this.maxHealth, 0);
         this.sprite.tint = 0xFF9090;
         setTimeout(() => { // forgive me pls for using a timeout
             this.sprite.tint = 0xFFFFFF; // reset tint

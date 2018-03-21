@@ -69,14 +69,14 @@
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_expose_loader_PIXI_phaser_ce_build_custom_pixi_js__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_expose_loader_PIXI_phaser_ce_build_custom_pixi_js__ = __webpack_require__(6);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_expose_loader_PIXI_phaser_ce_build_custom_pixi_js___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_expose_loader_PIXI_phaser_ce_build_custom_pixi_js__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_expose_loader_p2_phaser_ce_build_custom_p2_js__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_expose_loader_p2_phaser_ce_build_custom_p2_js__ = __webpack_require__(8);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_expose_loader_p2_phaser_ce_build_custom_p2_js___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_expose_loader_p2_phaser_ce_build_custom_p2_js__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_expose_loader_Phaser_phaser_ce_build_custom_phaser_split_js__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_expose_loader_Phaser_phaser_ce_build_custom_phaser_split_js__ = __webpack_require__(10);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_expose_loader_Phaser_phaser_ce_build_custom_phaser_split_js___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_expose_loader_Phaser_phaser_ce_build_custom_phaser_split_js__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__preload__ = __webpack_require__(12);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__main__ = __webpack_require__(13);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__preload__ = __webpack_require__(13);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__main__ = __webpack_require__(14);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__defs__ = __webpack_require__(1);
 
 /**
@@ -109,10 +109,29 @@ game.state.start("Preload");
 /* harmony default export */ __webpack_exports__["a"] = ({
     GAME_WIDTH: window.innerWidth,
     GAME_HEIGHT: window.innerHeight,
-    PIXEL_SIZE: 10, // Defines the size of pixels used to generate PIXEL_SPRITES
+    PIXEL_SIZE: 1, // Defines the size of pixels used to generate PIXEL_SPRITES
 
     FLOOR_Y: window.innerHeight * 0.50,
     FLOOR_HEIGHT: window.innerHeight * 0.3,
+
+    ITEMS: {
+        0: {
+            sprite: 'item'
+        },
+        1: {
+            sprite: 'item'
+        }
+    },
+
+    ENEMIES: {
+        0: {
+            sprite: 'enemy',
+            health: 10,
+            drop_rates: {
+                0: 0.1
+            }
+        }
+    },
 
     SPRITESHEETS: {
         '_test_spritesheet': {
@@ -134,6 +153,23 @@ game.state.start("Preload");
 
 /***/ }),
 /* 2 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+const State = {
+	coins: 0,
+    inCombat: false,
+    combatTurn: -1,
+
+	reset: function() {
+		this.coins = 0;
+	}
+}
+
+/* harmony default export */ __webpack_exports__["a"] = (State);
+
+/***/ }),
+/* 3 */
 /***/ (function(module, exports) {
 
 var g;
@@ -160,37 +196,69 @@ module.exports = g;
 
 
 /***/ }),
-/* 3 */
+/* 4 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-const State = {
-	coins: 0,
-    inCombat: false,
-    combatTurn: -1,
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__defs__ = __webpack_require__(1);
 
-	reset: function() {
-		this.coins = 0;
+
+
+/* harmony default export */ __webpack_exports__["a"] = ({
+	CreateDialog: (w, h, r) => {
+		r = r || 2;
+		let dialog = [];
+		for (var y = 0; y < h; y++) {
+			let line = '';
+			for (var x = 0; x < w; x++) {
+				if (x + y < r || w-1 - x + y < r || x + h-1 - y < r || w-1 - x + h-1 - y < r)
+					line += '.';
+				else if (x == 0 || y == 0 || x == w-1 || y == h-1
+					|| x + y == r || w-1 - x + y == r || x + h-1 - y == r || w-1 - x + h-1 - y == r)
+					line += '0';
+				else line += 'F'; 
+			}
+			dialog.push(line);
+		}
+
+		return __WEBPACK_IMPORTED_MODULE_0__game__["default"].create.texture(null, dialog, __WEBPACK_IMPORTED_MODULE_1__defs__["a" /* default */].PIXEL_SIZE, __WEBPACK_IMPORTED_MODULE_1__defs__["a" /* default */].PIXEL_SIZE, 0, false);
+	},
+
+	// Should only be used in a preload method because generating an image and adding to cache is async
+	CreateDummySprite: (name, w, h, color="#FFFFFF") => {
+		let bmd = __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.bitmapData(w, h);
+		bmd.ctx.beginPath();
+		bmd.ctx.rect(0, 0, w, h);
+		bmd.ctx.fillStyle = color;
+		bmd.ctx.fill();
+		__WEBPACK_IMPORTED_MODULE_0__game__["default"].load.imageFromBitmapData(name, bmd);
 	}
-}
-
-/* harmony default export */ __webpack_exports__["a"] = (State);
+});
 
 /***/ }),
-/* 4 */
+/* 5 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game__ = __webpack_require__(0);
 
 
+const HEALTH_BAR_WIDTH = 70;
+
 class Mob {
     constructor(hp) {
-        this.health = hp;
+        this.maxHealth = this.health = hp;
+
+        this.healthBar = __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.group(null);
+        this._healthBar = this.healthBar.add(new Phaser.Sprite(__WEBPACK_IMPORTED_MODULE_0__game__["default"], -HEALTH_BAR_WIDTH / 2, 10, 'blank'));
+        this._healthBar.width = HEALTH_BAR_WIDTH;
+        this._healthBar.tint = 0xFF0000;
     }
 
     hit() {
         this.health--;
+        this._healthBar.width = HEALTH_BAR_WIDTH * Math.max(this.health / this.maxHealth, 0);
         this.sprite.tint = 0xFF9090;
         setTimeout(() => { // forgive me pls for using a timeout
             this.sprite.tint = 0xFFFFFF; // reset tint
@@ -221,14 +289,14 @@ class Mob {
 
 
 /***/ }),
-/* 5 */
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
-/* WEBPACK VAR INJECTION */(function(global) {module.exports = global["PIXI"] = __webpack_require__(6);
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2)))
+/* WEBPACK VAR INJECTION */(function(global) {module.exports = global["PIXI"] = __webpack_require__(7);
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /**
@@ -7792,14 +7860,14 @@ PIXI.TextureUvs = function()
 }).call(this);
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
-/* WEBPACK VAR INJECTION */(function(global) {module.exports = global["p2"] = __webpack_require__(8);
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2)))
+/* WEBPACK VAR INJECTION */(function(global) {module.exports = global["p2"] = __webpack_require__(9);
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var require;var require;/**
@@ -21426,14 +21494,14 @@ World.prototype.raycast = function(result, ray){
 
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
-/* WEBPACK VAR INJECTION */(function(global) {module.exports = global["Phaser"] = __webpack_require__(10);
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2)))
+/* WEBPACK VAR INJECTION */(function(global) {module.exports = global["Phaser"] = __webpack_require__(11);
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(process) {/**
@@ -108200,10 +108268,10 @@ PIXI.canUseNewCanvasBlendModes = function () {
 * "What matters in this life is not what we do but what we do for others, the legacy we leave and the imprint we make." - Eric Meyer
 */
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(11)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(12)))
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports) {
 
 // shim for using process in browser
@@ -108393,7 +108461,7 @@ process.umask = function() { return 0; };
 
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -108448,16 +108516,17 @@ let loadPromises = [];
 
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__state__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__state__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__defs__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__utils__ = __webpack_require__(14);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__utils__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__player__ = __webpack_require__(15);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__enemy__ = __webpack_require__(16);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__lootnavigator__ = __webpack_require__(17);
 
 
 
@@ -108465,7 +108534,8 @@ let loadPromises = [];
 
 
 
-const ENEMY_COMBAT_POSITIONS = 5; // number of enemies that can be fought at once
+
+const ENEMY_COMBAT_POSITIONS = 3; // number of enemies that can be fought at once
 const COMBAT_ENTRY_RANGE = __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH * 0.4;
 const COMBAT_START_DELAY = 500;
 
@@ -108483,6 +108553,9 @@ let combatKeyTexts;
         __WEBPACK_IMPORTED_MODULE_3__utils__["a" /* default */].CreateDummySprite('player', 60, 130, "#99CF9A");
         __WEBPACK_IMPORTED_MODULE_3__utils__["a" /* default */].CreateDummySprite('enemy', 100, 70, "#D5999A");
         __WEBPACK_IMPORTED_MODULE_3__utils__["a" /* default */].CreateDummySprite('floor', 10, 10, "#604744");
+        __WEBPACK_IMPORTED_MODULE_3__utils__["a" /* default */].CreateDummySprite('item', 70, 70, "#44764A");
+
+        __WEBPACK_IMPORTED_MODULE_3__utils__["a" /* default */].CreateDummySprite('blank', 10, 10, "#FFFFFF");
     },
 
     create: () => {
@@ -108506,9 +108579,9 @@ let combatKeyTexts;
         enemies = [];
         enemiesInCombat = new Array(ENEMY_COMBAT_POSITIONS);
 
-        enemies.push(new __WEBPACK_IMPORTED_MODULE_5__enemy__["a" /* default */](__WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH - 500, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT * 0.7));
-        enemies.push(new __WEBPACK_IMPORTED_MODULE_5__enemy__["a" /* default */](__WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH - 600, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT * 0.7 + 50));
-        enemies.push(new __WEBPACK_IMPORTED_MODULE_5__enemy__["a" /* default */](__WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH - 550, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT * 0.7 - 100));
+        enemies.push(new __WEBPACK_IMPORTED_MODULE_5__enemy__["a" /* default */](__WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH - 500, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT * 0.7, 0));
+        enemies.push(new __WEBPACK_IMPORTED_MODULE_5__enemy__["a" /* default */](__WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH - 600, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT * 0.7 + 50, 0));
+        enemies.push(new __WEBPACK_IMPORTED_MODULE_5__enemy__["a" /* default */](__WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH - 550, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT * 0.7 - 100, 0));
 
         // add after enemies to keep on top, alternatively create a UI group that appears over top
         combatKeyTexts = [];
@@ -108517,6 +108590,8 @@ let combatKeyTexts;
             t.visible = false;
             combatKeyTexts[i] = t;
         }
+
+        new __WEBPACK_IMPORTED_MODULE_6__lootnavigator__["a" /* default */](__WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH - 300, 100);
     },
 
     update: () => {
@@ -108639,54 +108714,15 @@ let combatKeyTexts;
 });
 
 /***/ }),
-/* 14 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__defs__ = __webpack_require__(1);
-
-
-
-/* harmony default export */ __webpack_exports__["a"] = ({
-	CreateDialog: (w, h, r) => {
-		r = r || 2;
-		let dialog = [];
-		for (var y = 0; y < h; y++) {
-			let line = '';
-			for (var x = 0; x < w; x++) {
-				if (x + y < r || w-1 - x + y < r || x + h-1 - y < r || w-1 - x + h-1 - y < r)
-					line += '.';
-				else if (x == 0 || y == 0 || x == w-1 || y == h-1
-					|| x + y == r || w-1 - x + y == r || x + h-1 - y == r || w-1 - x + h-1 - y == r)
-					line += '0';
-				else line += '8'; 
-			}
-			dialog.push(line);
-		}
-
-		return __WEBPACK_IMPORTED_MODULE_0__game__["default"].create.texture(null, dialog, __WEBPACK_IMPORTED_MODULE_1__defs__["a" /* default */].PIXEL_SIZE, __WEBPACK_IMPORTED_MODULE_1__defs__["a" /* default */].PIXEL_SIZE, 0, false);
-	},
-
-	// Should only be used in a preload method because generating an image and adding to cache is async
-	CreateDummySprite: (name, w, h, color="#FFFFFF") => {
-		let bmd = __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.bitmapData(w, h);
-		bmd.ctx.beginPath();
-		bmd.ctx.rect(0, 0, w, h);
-		bmd.ctx.fillStyle = color;
-		bmd.ctx.fill();
-		__WEBPACK_IMPORTED_MODULE_0__game__["default"].load.imageFromBitmapData(name, bmd);
-	}
-});
-
-/***/ }),
 /* 15 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__state__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__mob__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__state__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__defs__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__mob__ = __webpack_require__(5);
+
 
 
 
@@ -108694,13 +108730,15 @@ let combatKeyTexts;
 const YSPEED = 1.5;
 const XSPEED = 3;
 
-class Player extends __WEBPACK_IMPORTED_MODULE_2__mob__["a" /* default */] {
+class Player extends __WEBPACK_IMPORTED_MODULE_3__mob__["a" /* default */] {
     constructor(x, y) {
         super(10);
 
         this.sprite = __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.sprite(x, y, 'player');
         this.sprite.anchor.set(0.5, 1); // set sprite anchor at feet
         __WEBPACK_IMPORTED_MODULE_0__game__["default"].camera.follow(this.sprite, Phaser.Camera.FOLLOW_PLATFORMER);
+
+        this.sprite.addChild(this.healthBar);
 
         this.keys = __WEBPACK_IMPORTED_MODULE_0__game__["default"].input.keyboard.createCursorKeys();
     }
@@ -108709,10 +108747,16 @@ class Player extends __WEBPACK_IMPORTED_MODULE_2__mob__["a" /* default */] {
         if (!__WEBPACK_IMPORTED_MODULE_1__state__["a" /* default */].inCombat) {
             if (this.keys.up.isDown) {
                 this.sprite.y -= YSPEED;
+                if (this.sprite.y < __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].FLOOR_Y) {
+                    this.sprite.y = __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].FLOOR_Y;
+                }
             }
 
             if (this.keys.down.isDown) {
                 this.sprite.y += YSPEED;
+                if (this.sprite.y > __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].FLOOR_Y + __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].FLOOR_HEIGHT) {
+                    this.sprite.y = __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].FLOOR_Y + __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].FLOOR_HEIGHT;
+                }
             }
 
             if (this.keys.left.isDown) {
@@ -108734,40 +108778,163 @@ class Player extends __WEBPACK_IMPORTED_MODULE_2__mob__["a" /* default */] {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__state__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__mob__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__state__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__defs__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__mob__ = __webpack_require__(5);
 
 
 
 
-const YSPEED = 1.5;
-const XSPEED = 3;
 
-class Enemy extends __WEBPACK_IMPORTED_MODULE_2__mob__["a" /* default */] {
-    constructor(x, y) {
-        super(3)
+const YSPEED = 1;
+const XSPEED = 2;
+const DIR_CHANGE_DELAY = 500;
 
-        this.sprite = __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.sprite(x, y, 'enemy');
+class Enemy extends __WEBPACK_IMPORTED_MODULE_3__mob__["a" /* default */] {
+    constructor(x, y, type) {
+        let DATA = __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].ENEMIES[type];
+        super(DATA.health)
+
+        this.sprite = __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.sprite(x, y, DATA.sprite);
         this.sprite.anchor.set(0.5, 1);
+
+        this.sprite.addChild(this.healthBar);
+
+        this.dir = 4;
+        this.changeDirectionTimer = 0;
     }
 
     update() {
         if (!__WEBPACK_IMPORTED_MODULE_1__state__["a" /* default */].inCombat) {
-            // random walk, add direction choice delay
-            // let rd = ~~(Math.random() * 10);
-            // if (rd == 0) {
-            //     this.sprite.x -= XSPEED;
-            // } else if (rd == 1) {
-            //     this.sprite.x += XSPEED;
-            // } else if (rd == 2) {
-            //     this.sprite.y += YSPEED;
-            // } else if (rd == 3) {
-            //     this.sprite.y -= YSPEED;
-            // }
+            if (this.changeDirectionTimer <= 0) {
+                this.changeDirectionTimer = DIR_CHANGE_DELAY * (1 + (Math.random() - 0.5) * 0.4);
+                this.dir = ~~(Math.random() * 10);
+            } else {
+                this.changeDirectionTimer -= __WEBPACK_IMPORTED_MODULE_0__game__["default"].time.elapsed;
+            }
+
+            if (this.dir == 0) {
+                this.sprite.x -= XSPEED;
+            } else if (this.dir == 1) {
+                this.sprite.x += XSPEED;
+            } else if (this.dir == 2) {
+                this.sprite.y += YSPEED;
+                if (this.sprite.y > __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].FLOOR_Y + __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].FLOOR_HEIGHT) {
+                    this.sprite.y = __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].FLOOR_Y + __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].FLOOR_HEIGHT;
+                }
+            } else if (this.dir == 3) {
+                this.sprite.y -= YSPEED;
+                if (this.sprite.y < __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].FLOOR_Y) {
+                    this.sprite.y = __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].FLOOR_Y;
+                }
+            }
         }
     }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = Enemy;
+
+
+/***/ }),
+/* 17 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__state__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__defs__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__utils__ = __webpack_require__(4);
+
+
+
+
+
+const HEIGHT = 130;
+const WIDTH = 220;
+function createDialog() {
+    let dialog = [];
+    for (var y = 0; y < HEIGHT; y++) {
+        let line = '';
+        for (var x = 0; x < WIDTH; x++) {
+            if (x == 0 || y == 0 || x == WIDTH-1 || y == HEIGHT-1)
+                line += '0';
+            else if (y < 30 || (x > 90 && x < 100)) line += 'C';
+            else line += 'F'; 
+        }
+        dialog.push(line);
+    }
+
+    return __WEBPACK_IMPORTED_MODULE_0__game__["default"].create.texture(null, dialog, 1, 1, Phaser.Create.PALETTE_C64, false);
+}
+
+class LootSelector {
+    constructor(lootNavigator) {
+        this.lootNavigator = lootNavigator;
+        this.dialog = __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.sprite(__WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH / 2 - 250, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT / 2 - 200, __WEBPACK_IMPORTED_MODULE_3__utils__["a" /* default */].CreateDialog(500, 400, 5));
+        this.dialog.visible = false;
+
+        let xi = 0, yi = 0;
+        for (var itemKey in __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].ITEMS) {
+            let item = __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].ITEMS[itemKey];
+            let itemSprite = this.dialog.addChild(new Phaser.Sprite(__WEBPACK_IMPORTED_MODULE_0__game__["default"], xi * 90 + 20, yi * 90 + 20, item.sprite));
+            itemSprite.inputEnabled = true;
+            itemSprite.events.onInputDown.add(() => this.onItemClicked(itemKey));
+            xi++;
+        }
+    }
+
+    onItemClicked(itemKey) {
+        this.dialog.visible = false;
+        this.lootNavigator.setSelectedItem(itemKey);
+    }
+
+    show() {
+        this.dialog.visible = true;
+    }
+}
+
+class LootNavigator {
+    constructor(x, y) {
+        this.dialog = __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.sprite(x, y, createDialog());
+        this.dialog.addChild(new Phaser.Text(__WEBPACK_IMPORTED_MODULE_0__game__["default"], 0, 0, "Item Progress", {
+            "font": "Verdana",
+            fill: "#FFF",
+            fontSize: "22px",
+            boundsAlignH: "center",
+            boundsAlignV: "middle"
+        })).setTextBounds(0, 0, WIDTH, 30);
+
+        this.clickToSelectText = this.dialog.addChild(new Phaser.Text(__WEBPACK_IMPORTED_MODULE_0__game__["default"], 0, 0, "Click to\nSelect", {
+            "font": "Verdana",
+            fill: "#FFF",
+            fontSize: "17px",
+            align: "center",
+            boundsAlignH: "center",
+            boundsAlignV: "middle"
+        })).setTextBounds(0, 30, 90, 100);
+
+        this.itemSprite = this.dialog.addChild(new Phaser.Sprite(__WEBPACK_IMPORTED_MODULE_0__game__["default"], 45, 80));
+        this.itemSprite.anchor.set(0.5);
+
+        this.clickArea = this.dialog.addChild(new Phaser.Sprite(__WEBPACK_IMPORTED_MODULE_0__game__["default"], 0, 30, 'blank'));
+        this.clickArea.width = 90;
+        this.clickArea.height = 100;
+        this.clickArea.alpha = 0;
+        this.clickArea.inputEnabled = true;
+        this.clickArea.events.onInputDown.add(this.onClick, this);
+
+        this.lootSelector = new LootSelector(this);
+    }
+
+    setSelectedItem(itemKey) {
+        this.itemSprite.loadTexture(__WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].ITEMS[itemKey].sprite);
+        this.clickToSelectText.visible = false;
+    }
+
+    onClick() {
+        this.lootSelector.show();
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = LootNavigator;
 
 
 /***/ })

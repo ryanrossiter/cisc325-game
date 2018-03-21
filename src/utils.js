@@ -13,7 +13,7 @@ export default {
 				else if (x == 0 || y == 0 || x == w-1 || y == h-1
 					|| x + y == r || w-1 - x + y == r || x + h-1 - y == r || w-1 - x + h-1 - y == r)
 					line += '0';
-				else line += '8'; 
+				else line += 'F'; 
 			}
 			dialog.push(line);
 		}

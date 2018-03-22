@@ -1,5 +1,6 @@
 import game from './game';
 import Defs from './defs';
+import Utils from './utils';
 
 let loadPromises = [];
 export default {
@@ -9,6 +10,19 @@ export default {
     },
     
     preload: () => {
+        // TODO: replace dummy sprites with actual sprites
+        Utils.CreateDummySprite('player', 150, 230, "#99CF9A");
+        Utils.CreateDummySprite('enemy', 120, 100, "#D5999A");
+        Utils.CreateDummySprite('floor', 10, 10, "#604744");
+        Utils.CreateDummySprite('item', 140, 140, "#44764A");
+
+        Utils.CreateDummySprite('blank', 10, 10, "#FFFFFF");
+
+        // Load sprite from files listed in Defs.SPRITES
+        for (const spriteName in Defs.SPRITES) {
+            game.load.image(spriteName, Defs.SPRITES[spriteName]);
+        }
+
         // Create sprites that are defined by pixel arrays in Defs.PIXEL_SPRITES
         for (const spriteName in Defs.PIXEL_SPRITES) {
             loadPromises.push(new Promise((resolve) => {
@@ -25,16 +39,6 @@ export default {
             }));
         }
 
-        // Load sprite from files listed in Defs.SPRITES
-        for (const spriteName in Defs.SPRITES) {
-            game.load.image(spriteName, Defs.SPRITES[spriteName]);
-        }
-
-        if (game.load.isLoading) {
-            // Add a promise to wait for all file sprites to be loaded
-            loadPromises.push(new Promise((resolve) => game.load.onLoadComplete.add(resolve)));
-        }
-
         Promise.all(loadPromises).then(() => {
             // After all sprites are loaded create spritesheets as defined in Defs.SPRITESHEETS
             for (const spriteName in Defs.SPRITESHEETS) {
@@ -43,9 +47,11 @@ export default {
                     data.frameWidth * Defs.PIXEL_SIZE, data.frameHeight * Defs.PIXEL_SIZE
                 );
             }
-
-            // switch to next state
-            game.state.start("MainMenu");
         });
+    },
+
+    create: () => {
+        // switch to next state
+        game.state.start(Defs.INITIAL_STATE);
     },
 }

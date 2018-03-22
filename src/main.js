@@ -19,16 +19,6 @@ let combatKeys;
 let combatKeyTexts;
 
 export default {
-    preload: () => {
-        // TODO: replace dummy sprites with actual sprites
-        Utils.CreateDummySprite('player', 150, 230, "#99CF9A");
-        Utils.CreateDummySprite('enemy', 120, 100, "#D5999A");
-        Utils.CreateDummySprite('floor', 10, 10, "#604744");
-        Utils.CreateDummySprite('item', 140, 140, "#44764A");
-
-        Utils.CreateDummySprite('blank', 10, 10, "#FFFFFF");
-    },
-
     create: () => {
         State.reset();
         

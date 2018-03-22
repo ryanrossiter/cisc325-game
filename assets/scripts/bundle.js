@@ -79,6 +79,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__main__ = __webpack_require__(14);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__defs__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__menus_main_menu__ = __webpack_require__(18);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__menus_journey_select__ = __webpack_require__(20);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__menus_title__ = __webpack_require__(22);
 
 /**
  * Import Phaser dependencies using `expose-loader`.
@@ -96,11 +98,15 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 
+
+
 const game = new __WEBPACK_IMPORTED_MODULE_2_expose_loader_Phaser_phaser_ce_build_custom_phaser_split_js___default.a.Game(__WEBPACK_IMPORTED_MODULE_5__defs__["a" /* default */].GAME_WIDTH, __WEBPACK_IMPORTED_MODULE_5__defs__["a" /* default */].GAME_HEIGHT, __WEBPACK_IMPORTED_MODULE_2_expose_loader_Phaser_phaser_ce_build_custom_phaser_split_js___default.a.AUTO, 'phaser-parent');
 
 game.state.add("Preload", __WEBPACK_IMPORTED_MODULE_3__preload__["a" /* default */]);
 game.state.add("Main", __WEBPACK_IMPORTED_MODULE_4__main__["a" /* default */]);
+game.state.add("Title", __WEBPACK_IMPORTED_MODULE_8__menus_title__["a" /* default */]);
 game.state.add("MainMenu", __WEBPACK_IMPORTED_MODULE_6__menus_main_menu__["a" /* default */]);
+game.state.add("JourneySelect", __WEBPACK_IMPORTED_MODULE_7__menus_journey_select__["a" /* default */]);
 game.state.start("Preload");
 
 /* harmony default export */ __webpack_exports__["default"] = (game);
@@ -111,7 +117,7 @@ game.state.start("Preload");
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-const MSR = 3.5; // max scale ratio
+const MSR = 4; // max scale ratio
 const GAME_WIDTH = 360 * MSR;
 const GAME_HEIGHT = 640 * MSR;
 
@@ -120,6 +126,8 @@ const GAME_HEIGHT = 640 * MSR;
     GAME_HEIGHT,
     SCALE_RATIO: window.devicePixelRatio / MSR, // 3.5 is the max scale ratio
     PIXEL_SIZE: 1, // Defines the size of pixels used to generate PIXEL_SPRITES
+
+    INITIAL_STATE: 'Title',
 
     FLOOR_Y: GAME_HEIGHT * 0.5,
     FLOOR_HEIGHT: GAME_HEIGHT * 0.2,
@@ -152,7 +160,7 @@ const GAME_HEIGHT = 640 * MSR;
     },
 
     SPRITES: {
-        //'player': '../img/player.png',
+        'title': '/assets/img/title.png',
     },
 
     PIXEL_SPRITES: {
@@ -108511,6 +108519,8 @@ process.umask = function() { return 0; };
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__defs__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__utils__ = __webpack_require__(3);
+
 
 
 
@@ -108522,6 +108532,19 @@ let loadPromises = [];
     },
     
     preload: () => {
+        // TODO: replace dummy sprites with actual sprites
+        __WEBPACK_IMPORTED_MODULE_2__utils__["a" /* default */].CreateDummySprite('player', 150, 230, "#99CF9A");
+        __WEBPACK_IMPORTED_MODULE_2__utils__["a" /* default */].CreateDummySprite('enemy', 120, 100, "#D5999A");
+        __WEBPACK_IMPORTED_MODULE_2__utils__["a" /* default */].CreateDummySprite('floor', 10, 10, "#604744");
+        __WEBPACK_IMPORTED_MODULE_2__utils__["a" /* default */].CreateDummySprite('item', 140, 140, "#44764A");
+
+        __WEBPACK_IMPORTED_MODULE_2__utils__["a" /* default */].CreateDummySprite('blank', 10, 10, "#FFFFFF");
+
+        // Load sprite from files listed in Defs.SPRITES
+        for (const spriteName in __WEBPACK_IMPORTED_MODULE_1__defs__["a" /* default */].SPRITES) {
+            __WEBPACK_IMPORTED_MODULE_0__game__["default"].load.image(spriteName, __WEBPACK_IMPORTED_MODULE_1__defs__["a" /* default */].SPRITES[spriteName]);
+        }
+
         // Create sprites that are defined by pixel arrays in Defs.PIXEL_SPRITES
         for (const spriteName in __WEBPACK_IMPORTED_MODULE_1__defs__["a" /* default */].PIXEL_SPRITES) {
             loadPromises.push(new Promise((resolve) => {
@@ -108538,16 +108561,6 @@ let loadPromises = [];
             }));
         }
 
-        // Load sprite from files listed in Defs.SPRITES
-        for (const spriteName in __WEBPACK_IMPORTED_MODULE_1__defs__["a" /* default */].SPRITES) {
-            __WEBPACK_IMPORTED_MODULE_0__game__["default"].load.image(spriteName, __WEBPACK_IMPORTED_MODULE_1__defs__["a" /* default */].SPRITES[spriteName]);
-        }
-
-        if (__WEBPACK_IMPORTED_MODULE_0__game__["default"].load.isLoading) {
-            // Add a promise to wait for all file sprites to be loaded
-            loadPromises.push(new Promise((resolve) => __WEBPACK_IMPORTED_MODULE_0__game__["default"].load.onLoadComplete.add(resolve)));
-        }
-
         Promise.all(loadPromises).then(() => {
             // After all sprites are loaded create spritesheets as defined in Defs.SPRITESHEETS
             for (const spriteName in __WEBPACK_IMPORTED_MODULE_1__defs__["a" /* default */].SPRITESHEETS) {
@@ -108556,10 +108569,12 @@ let loadPromises = [];
                     data.frameWidth * __WEBPACK_IMPORTED_MODULE_1__defs__["a" /* default */].PIXEL_SIZE, data.frameHeight * __WEBPACK_IMPORTED_MODULE_1__defs__["a" /* default */].PIXEL_SIZE
                 );
             }
-
-            // switch to next state
-            __WEBPACK_IMPORTED_MODULE_0__game__["default"].state.start("MainMenu");
         });
+    },
+
+    create: () => {
+        // switch to next state
+        __WEBPACK_IMPORTED_MODULE_0__game__["default"].state.start(__WEBPACK_IMPORTED_MODULE_1__defs__["a" /* default */].INITIAL_STATE);
     },
 });
 
@@ -108597,16 +108612,6 @@ let combatKeys;
 let combatKeyTexts;
 
 /* harmony default export */ __webpack_exports__["a"] = ({
-    preload: () => {
-        // TODO: replace dummy sprites with actual sprites
-        __WEBPACK_IMPORTED_MODULE_3__utils__["a" /* default */].CreateDummySprite('player', 150, 230, "#99CF9A");
-        __WEBPACK_IMPORTED_MODULE_3__utils__["a" /* default */].CreateDummySprite('enemy', 120, 100, "#D5999A");
-        __WEBPACK_IMPORTED_MODULE_3__utils__["a" /* default */].CreateDummySprite('floor', 10, 10, "#604744");
-        __WEBPACK_IMPORTED_MODULE_3__utils__["a" /* default */].CreateDummySprite('item', 140, 140, "#44764A");
-
-        __WEBPACK_IMPORTED_MODULE_3__utils__["a" /* default */].CreateDummySprite('blank', 10, 10, "#FFFFFF");
-    },
-
     create: () => {
         __WEBPACK_IMPORTED_MODULE_1__state__["a" /* default */].reset();
         
@@ -109154,6 +109159,195 @@ class NameDialog {
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = NameDialog;
 
+
+/***/ }),
+/* 20 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__state__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__defs__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__utils__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__components_Button__ = __webpack_require__(21);
+
+
+
+
+
+
+let newGameButton;
+let continueButton;
+let leaderboardButton;
+
+const titleTextStyle = {
+    "font": "Verdana",
+    fill: "#111",
+    fontSize: "80px",
+    fontWeight: "bold"
+};
+
+const outlineTextStyle = {
+    "font": "Verdana",
+    fill: "#FFF",
+    stroke: "#222",
+    strokeThickness: 10,
+    fontSize: "80px",
+    fontWeight: "bold"
+};
+
+const labelTextStyle = {
+    "font": "Verdana",
+    fill: "#111",
+    fontSize: "70px"
+};
+
+/* harmony default export */ __webpack_exports__["a"] = ({
+    create: () => {
+        __WEBPACK_IMPORTED_MODULE_0__game__["default"].stage.backgroundColor = "#E5E5E5";
+        __WEBPACK_IMPORTED_MODULE_0__game__["default"].world.setBounds(0, 0, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH * 100, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT);
+
+        __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.text(__WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH / 2, 120, "Start A New Journey!", titleTextStyle).anchor.set(0.5);
+        let data = [
+            {
+                label: 'DIFFICULTY',
+                prop: 'difficulty',
+                options: ['easy', 'medium', 'hard'],
+                labels: ['EZ', 'so-so', 'Crazy']
+            },
+            {
+                label: 'CLASS',
+                prop: 'class',
+                options: ['warrior', 'mage', 'archer'],
+                labels: ['Warrior', 'Mage', 'Archer']
+            },
+            {
+                label: 'TYPE',
+                prop: 'type',
+                options: ['fire', 'water', 'elec', 'earth'],
+                labels: ['Fire', 'Water', 'Elec', 'Earth']
+            },
+            {
+                label: 'FOCUS',
+                prop: 'focus',
+                options: ['phys', 'skill', 'buff', 'util'],
+                labels: ['Attack', 'Skill', 'Buff', 'Utility']
+            }
+        ];
+
+        for (var y = 0; y < data.length; y++) {
+            let d = data[y];
+            d.buttons = [];
+            var n = d.options.length;
+            __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.text(30, y * 500 + 230, d.label, outlineTextStyle);
+
+            for (var i = 0; i < n; i++) {
+                let btn = d.buttons[i] = new __WEBPACK_IMPORTED_MODULE_4__components_Button__["a" /* default */](__WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH / n * (i + 0.5), y * 500 + 520);
+                btn.toggle = true;
+                btn.allowDisable = false;
+                btn.index = i;
+                btn.onChange = (pressed) => {
+                    if (pressed) {
+                        if (d.selected !== undefined) {
+                            d.buttons[d.selected].setPressed(false);
+                        }
+
+                        __WEBPACK_IMPORTED_MODULE_1__state__["a" /* default */][d.prop] = d.options[btn.index];
+                        d.selected = btn.index;
+                    }
+                };
+
+                btn.sprite.addChild(new Phaser.Sprite(__WEBPACK_IMPORTED_MODULE_0__game__["default"], 0, -btn.sprite.height * 0.2, 'blank')).anchor.set(0.5);
+                btn.sprite.addChild(new Phaser.Text(__WEBPACK_IMPORTED_MODULE_0__game__["default"], 0, btn.sprite.height * 0.3, d.labels[i], labelTextStyle)).anchor.set(0.5);
+            }
+        }
+    },
+
+    update: () => {
+    },
+});
+
+/***/ }),
+/* 21 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__state__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__defs__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__utils__ = __webpack_require__(3);
+
+
+
+
+
+const WIDTH = __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH * 0.22;
+const HEIGHT = WIDTH;
+
+class Button {
+    constructor(x, y, w=WIDTH, h=HEIGHT, toggle=false, allowDisable=true) {
+        this.toggle = toggle;
+        this.allowDisable = allowDisable;
+        this.pressed = false;
+
+        var buttonBmd = __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.bitmapData(w, h, 'newGameButton', true);
+        buttonBmd.ctx.fillStyle = "#CCCCD0";
+        buttonBmd.ctx.strokeStyle = "#333";
+        buttonBmd.ctx.lineWidth = 10;
+        __WEBPACK_IMPORTED_MODULE_3__utils__["a" /* default */].DrawRoundedRect(buttonBmd.ctx, 0, 0, w, h, 20);
+        this.sprite = __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.sprite(x, y, buttonBmd);
+        this.sprite.anchor.set(0.5);
+        this.sprite.inputEnabled = true;
+        this.sprite.events.onInputDown.add(() => this.onInputDown());
+        this.sprite.events.onInputUp.add(() => this.onInputUp());
+    }
+
+    onChange(pressed) {} // override
+
+    setPressed(pressed) {
+        this.pressed = pressed;
+        this.sprite.tint = (this.pressed? 0xCCCCCC : 0xFFFFFF);
+        this.onChange(pressed);
+    }
+
+    onInputDown() {
+        if (!this.pressed || this.allowDisable) this.setPressed(!this.pressed);
+    }
+
+    onInputUp() {
+        if (!this.toggle) this.setPressed(false);
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = Button;
+
+
+/***/ }),
+/* 22 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__state__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__defs__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__utils__ = __webpack_require__(3);
+
+
+
+
+
+/* harmony default export */ __webpack_exports__["a"] = ({
+    create: () => {
+        var titleSprite = __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.sprite(__WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH / 2, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT / 2, 'title');
+        titleSprite.anchor.set(0.5);
+        titleSprite.inputEnabled = true;
+        titleSprite.events.onInputDown.add(() => {
+            __WEBPACK_IMPORTED_MODULE_0__game__["default"].state.start("MainMenu");
+        });
+    },
+
+    update: () => {
+    },
+});
 
 /***/ })
 /******/ ]);

@@ -1,4 +1,4 @@
-const MSR = 3.5; // max scale ratio
+const MSR = 4; // max scale ratio
 const GAME_WIDTH = 360 * MSR;
 const GAME_HEIGHT = 640 * MSR;
 
@@ -7,6 +7,8 @@ export default {
     GAME_HEIGHT,
     SCALE_RATIO: window.devicePixelRatio / MSR, // 3.5 is the max scale ratio
     PIXEL_SIZE: 1, // Defines the size of pixels used to generate PIXEL_SPRITES
+
+    INITIAL_STATE: 'Title',
 
     FLOOR_Y: GAME_HEIGHT * 0.5,
     FLOOR_HEIGHT: GAME_HEIGHT * 0.2,
@@ -39,7 +41,7 @@ export default {
     },
 
     SPRITES: {
-        //'player': '../img/player.png',
+        'title': '/assets/img/title.png',
     },
 
     PIXEL_SPRITES: {

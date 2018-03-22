@@ -13,9 +13,13 @@ import Preload from './preload';
 import Main from './main';
 import Defs from './defs';
 
+import MainMenu from './menus/main_menu';
+
 const game = new Phaser.Game(Defs.GAME_WIDTH, Defs.GAME_HEIGHT, Phaser.AUTO, 'phaser-parent');
+
 game.state.add("Preload", Preload);
 game.state.add("Main", Main);
+game.state.add("MainMenu", MainMenu);
 game.state.start("Preload");
 
 export default game;

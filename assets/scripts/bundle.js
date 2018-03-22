@@ -78,6 +78,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__preload__ = __webpack_require__(13);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__main__ = __webpack_require__(14);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__defs__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__menus_main_menu__ = __webpack_require__(18);
 
 /**
  * Import Phaser dependencies using `expose-loader`.
@@ -93,9 +94,13 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 
+
+
 const game = new __WEBPACK_IMPORTED_MODULE_2_expose_loader_Phaser_phaser_ce_build_custom_phaser_split_js___default.a.Game(__WEBPACK_IMPORTED_MODULE_5__defs__["a" /* default */].GAME_WIDTH, __WEBPACK_IMPORTED_MODULE_5__defs__["a" /* default */].GAME_HEIGHT, __WEBPACK_IMPORTED_MODULE_2_expose_loader_Phaser_phaser_ce_build_custom_phaser_split_js___default.a.AUTO, 'phaser-parent');
+
 game.state.add("Preload", __WEBPACK_IMPORTED_MODULE_3__preload__["a" /* default */]);
 game.state.add("Main", __WEBPACK_IMPORTED_MODULE_4__main__["a" /* default */]);
+game.state.add("MainMenu", __WEBPACK_IMPORTED_MODULE_6__menus_main_menu__["a" /* default */]);
 game.state.start("Preload");
 
 /* harmony default export */ __webpack_exports__["default"] = (game);
@@ -106,13 +111,18 @@ game.state.start("Preload");
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+const MSR = 3.5; // max scale ratio
+const GAME_WIDTH = 360 * MSR;
+const GAME_HEIGHT = 640 * MSR;
+
 /* harmony default export */ __webpack_exports__["a"] = ({
-    GAME_WIDTH: window.innerWidth,
-    GAME_HEIGHT: window.innerHeight,
+    GAME_WIDTH,
+    GAME_HEIGHT,
+    SCALE_RATIO: window.devicePixelRatio / MSR, // 3.5 is the max scale ratio
     PIXEL_SIZE: 1, // Defines the size of pixels used to generate PIXEL_SPRITES
 
-    FLOOR_Y: window.innerHeight * 0.50,
-    FLOOR_HEIGHT: window.innerHeight * 0.3,
+    FLOOR_Y: GAME_HEIGHT * 0.5,
+    FLOOR_HEIGHT: GAME_HEIGHT * 0.2,
 
     ITEMS: {
         0: {
@@ -170,33 +180,6 @@ const State = {
 
 /***/ }),
 /* 3 */
-/***/ (function(module, exports) {
-
-var g;
-
-// This works in non-strict mode
-g = (function() {
-	return this;
-})();
-
-try {
-	// This works if eval is allowed (see CSP)
-	g = g || Function("return this")() || (1,eval)("this");
-} catch(e) {
-	// This works if the window reference is available
-	if(typeof window === "object")
-		g = window;
-}
-
-// g can still be undefined, but nothing to do about it...
-// We return undefined, instead of nothing here, so it's
-// easier to handle this case. if(!global) { ...}
-
-module.exports = g;
-
-
-/***/ }),
-/* 4 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -225,6 +208,40 @@ module.exports = g;
 		return __WEBPACK_IMPORTED_MODULE_0__game__["default"].create.texture(null, dialog, __WEBPACK_IMPORTED_MODULE_1__defs__["a" /* default */].PIXEL_SIZE, __WEBPACK_IMPORTED_MODULE_1__defs__["a" /* default */].PIXEL_SIZE, 0, false);
 	},
 
+	DrawRoundedRect: (ctx, x, y, width, height, radius=5, fill=true, stroke=true) => {
+        if (typeof radius === 'number') {
+            radius = {tl: radius, tr: radius, br: radius, bl: radius};
+        } else {
+            var defaultRadius = {tl: 0, tr: 0, br: 0, bl: 0};
+            for (var side in defaultRadius) {
+                radius[side] = radius[side] || defaultRadius[side];
+            }
+        }
+        ctx.beginPath();
+        ctx.moveTo(x + radius.tl, y);
+        ctx.lineTo(x + width - radius.tr, y);
+        ctx.quadraticCurveTo(x + width, y, x + width, y + radius.tr);
+        ctx.lineTo(x + width, y + height - radius.br);
+        ctx.quadraticCurveTo(x + width, y + height, x + width - radius.br, y + height);
+        ctx.lineTo(x + radius.bl, y + height);
+        ctx.quadraticCurveTo(x, y + height, x, y + height - radius.bl);
+        ctx.lineTo(x, y + radius.tl);
+        ctx.quadraticCurveTo(x, y, x + radius.tl, y);
+        ctx.closePath();
+
+        ctx.save();
+		ctx.clip();
+		ctx.lineWidth *= 2;
+        if (fill) {
+            ctx.fill();
+        }
+        if (stroke) {
+            ctx.stroke();
+        }
+        ctx.restore();
+        ctx.lineWidth /= 2;
+    },
+
 	// Should only be used in a preload method because generating an image and adding to cache is async
 	CreateDummySprite: (name, w, h, color="#FFFFFF") => {
 		let bmd = __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.bitmapData(w, h);
@@ -235,6 +252,33 @@ module.exports = g;
 		__WEBPACK_IMPORTED_MODULE_0__game__["default"].load.imageFromBitmapData(name, bmd);
 	}
 });
+
+/***/ }),
+/* 4 */
+/***/ (function(module, exports) {
+
+var g;
+
+// This works in non-strict mode
+g = (function() {
+	return this;
+})();
+
+try {
+	// This works if eval is allowed (see CSP)
+	g = g || Function("return this")() || (1,eval)("this");
+} catch(e) {
+	// This works if the window reference is available
+	if(typeof window === "object")
+		g = window;
+}
+
+// g can still be undefined, but nothing to do about it...
+// We return undefined, instead of nothing here, so it's
+// easier to handle this case. if(!global) { ...}
+
+module.exports = g;
+
 
 /***/ }),
 /* 5 */
@@ -293,7 +337,7 @@ class Mob {
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global) {module.exports = global["PIXI"] = __webpack_require__(7);
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
 
 /***/ }),
 /* 7 */
@@ -7864,7 +7908,7 @@ PIXI.TextureUvs = function()
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global) {module.exports = global["p2"] = __webpack_require__(9);
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
 
 /***/ }),
 /* 9 */
@@ -21498,7 +21542,7 @@ World.prototype.raycast = function(result, ray){
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global) {module.exports = global["Phaser"] = __webpack_require__(11);
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
 
 /***/ }),
 /* 11 */
@@ -108472,6 +108516,11 @@ process.umask = function() { return 0; };
 
 let loadPromises = [];
 /* harmony default export */ __webpack_exports__["a"] = ({
+    init: () => {
+        __WEBPACK_IMPORTED_MODULE_0__game__["default"].scale.scaleMode = Phaser.ScaleManager.USER_SCALE;
+        __WEBPACK_IMPORTED_MODULE_0__game__["default"].scale.setUserScale(__WEBPACK_IMPORTED_MODULE_1__defs__["a" /* default */].SCALE_RATIO, __WEBPACK_IMPORTED_MODULE_1__defs__["a" /* default */].SCALE_RATIO);
+    },
+    
     preload: () => {
         // Create sprites that are defined by pixel arrays in Defs.PIXEL_SPRITES
         for (const spriteName in __WEBPACK_IMPORTED_MODULE_1__defs__["a" /* default */].PIXEL_SPRITES) {
@@ -108509,7 +108558,7 @@ let loadPromises = [];
             }
 
             // switch to next state
-            __WEBPACK_IMPORTED_MODULE_0__game__["default"].state.start("Main");
+            __WEBPACK_IMPORTED_MODULE_0__game__["default"].state.start("MainMenu");
         });
     },
 });
@@ -108523,7 +108572,7 @@ let loadPromises = [];
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__state__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__defs__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__utils__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__utils__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__player__ = __webpack_require__(15);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__enemy__ = __webpack_require__(16);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__lootnavigator__ = __webpack_require__(17);
@@ -108550,10 +108599,10 @@ let combatKeyTexts;
 /* harmony default export */ __webpack_exports__["a"] = ({
     preload: () => {
         // TODO: replace dummy sprites with actual sprites
-        __WEBPACK_IMPORTED_MODULE_3__utils__["a" /* default */].CreateDummySprite('player', 60, 130, "#99CF9A");
-        __WEBPACK_IMPORTED_MODULE_3__utils__["a" /* default */].CreateDummySprite('enemy', 100, 70, "#D5999A");
+        __WEBPACK_IMPORTED_MODULE_3__utils__["a" /* default */].CreateDummySprite('player', 150, 230, "#99CF9A");
+        __WEBPACK_IMPORTED_MODULE_3__utils__["a" /* default */].CreateDummySprite('enemy', 120, 100, "#D5999A");
         __WEBPACK_IMPORTED_MODULE_3__utils__["a" /* default */].CreateDummySprite('floor', 10, 10, "#604744");
-        __WEBPACK_IMPORTED_MODULE_3__utils__["a" /* default */].CreateDummySprite('item', 70, 70, "#44764A");
+        __WEBPACK_IMPORTED_MODULE_3__utils__["a" /* default */].CreateDummySprite('item', 140, 140, "#44764A");
 
         __WEBPACK_IMPORTED_MODULE_3__utils__["a" /* default */].CreateDummySprite('blank', 10, 10, "#FFFFFF");
     },
@@ -108591,7 +108640,7 @@ let combatKeyTexts;
             combatKeyTexts[i] = t;
         }
 
-        new __WEBPACK_IMPORTED_MODULE_6__lootnavigator__["a" /* default */](__WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH - 300, 100);
+        new __WEBPACK_IMPORTED_MODULE_6__lootnavigator__["a" /* default */](__WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH / 2, 110);
     },
 
     update: () => {
@@ -108842,40 +108891,31 @@ class Enemy extends __WEBPACK_IMPORTED_MODULE_3__mob__["a" /* default */] {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__state__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__defs__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__utils__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__utils__ = __webpack_require__(3);
 
 
 
 
 
-const HEIGHT = 130;
-const WIDTH = 220;
-function createDialog() {
-    let dialog = [];
-    for (var y = 0; y < HEIGHT; y++) {
-        let line = '';
-        for (var x = 0; x < WIDTH; x++) {
-            if (x == 0 || y == 0 || x == WIDTH-1 || y == HEIGHT-1)
-                line += '0';
-            else if (y < 30 || (x > 90 && x < 100)) line += 'C';
-            else line += 'F'; 
-        }
-        dialog.push(line);
-    }
-
-    return __WEBPACK_IMPORTED_MODULE_0__game__["default"].create.texture(null, dialog, 1, 1, Phaser.Create.PALETTE_C64, false);
-}
+const TITLE_HEIGHT = 90;
+const HEIGHT = 350;
+const WIDTH = 550;
 
 class LootSelector {
     constructor(lootNavigator) {
         this.lootNavigator = lootNavigator;
-        this.dialog = __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.sprite(__WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH / 2 - 250, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT / 2 - 200, __WEBPACK_IMPORTED_MODULE_3__utils__["a" /* default */].CreateDialog(500, 400, 5));
+        var dialogBmd = __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.bitmapData(1000, 800, null, false);
+        dialogBmd.ctx.fillStyle = "#EEF";
+        dialogBmd.ctx.strokeStyle = "#222";
+        dialogBmd.ctx.lineWidth = 14;
+        __WEBPACK_IMPORTED_MODULE_3__utils__["a" /* default */].DrawRoundedRect(dialogBmd.ctx, 0, 0, 1000, 800, 20);
+        this.dialog = __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.sprite(__WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH / 2 - 500, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT / 2 - 400, dialogBmd);
         this.dialog.visible = false;
 
         let xi = 0, yi = 0;
         for (var itemKey in __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].ITEMS) {
             let item = __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].ITEMS[itemKey];
-            let itemSprite = this.dialog.addChild(new Phaser.Sprite(__WEBPACK_IMPORTED_MODULE_0__game__["default"], xi * 90 + 20, yi * 90 + 20, item.sprite));
+            let itemSprite = this.dialog.addChild(new Phaser.Sprite(__WEBPACK_IMPORTED_MODULE_0__game__["default"], xi * 180 + 50, yi * 180 + 50, item.sprite));
             itemSprite.inputEnabled = true;
             itemSprite.events.onInputDown.add(() => this.onItemClicked(itemKey));
             xi++;
@@ -108894,30 +108934,41 @@ class LootSelector {
 
 class LootNavigator {
     constructor(x, y) {
-        this.dialog = __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.sprite(x, y, createDialog());
+        var dialogBmd = __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.bitmapData(WIDTH, HEIGHT, null, false);
+        dialogBmd.ctx.fillStyle = "#666";
+        dialogBmd.ctx.strokeStyle = "#333";
+        dialogBmd.ctx.lineWidth = 14;
+        __WEBPACK_IMPORTED_MODULE_3__utils__["a" /* default */].DrawRoundedRect(dialogBmd.ctx, 0, 0, WIDTH, HEIGHT, 20, true, false); // fill
+        dialogBmd.ctx.fillStyle = "#777";
+        dialogBmd.ctx.clip();
+        dialogBmd.ctx.fillRect(0, TITLE_HEIGHT, 200, 260);
+        dialogBmd.ctx.fillRect(220, TITLE_HEIGHT, 330, 260);
+        __WEBPACK_IMPORTED_MODULE_3__utils__["a" /* default */].DrawRoundedRect(dialogBmd.ctx, 0, 0, WIDTH, HEIGHT, 20, false, true); // stroke
+        this.dialog = __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.sprite(x, y, dialogBmd);
+
         this.dialog.addChild(new Phaser.Text(__WEBPACK_IMPORTED_MODULE_0__game__["default"], 0, 0, "Item Progress", {
             "font": "Verdana",
             fill: "#FFF",
-            fontSize: "22px",
+            fontSize: "44px",
             boundsAlignH: "center",
             boundsAlignV: "middle"
-        })).setTextBounds(0, 0, WIDTH, 30);
+        })).setTextBounds(0, 2, WIDTH, TITLE_HEIGHT);
 
         this.clickToSelectText = this.dialog.addChild(new Phaser.Text(__WEBPACK_IMPORTED_MODULE_0__game__["default"], 0, 0, "Click to\nSelect", {
             "font": "Verdana",
             fill: "#FFF",
-            fontSize: "17px",
+            fontSize: "34px",
             align: "center",
             boundsAlignH: "center",
             boundsAlignV: "middle"
-        })).setTextBounds(0, 30, 90, 100);
+        })).setTextBounds(0, TITLE_HEIGHT, 200, 260);
 
-        this.itemSprite = this.dialog.addChild(new Phaser.Sprite(__WEBPACK_IMPORTED_MODULE_0__game__["default"], 45, 80));
+        this.itemSprite = this.dialog.addChild(new Phaser.Sprite(__WEBPACK_IMPORTED_MODULE_0__game__["default"], 100, 220));
         this.itemSprite.anchor.set(0.5);
 
-        this.clickArea = this.dialog.addChild(new Phaser.Sprite(__WEBPACK_IMPORTED_MODULE_0__game__["default"], 0, 30, 'blank'));
-        this.clickArea.width = 90;
-        this.clickArea.height = 100;
+        this.clickArea = this.dialog.addChild(new Phaser.Sprite(__WEBPACK_IMPORTED_MODULE_0__game__["default"], 0, TITLE_HEIGHT, 'blank'));
+        this.clickArea.width = 180;
+        this.clickArea.height = 200;
         this.clickArea.alpha = 0;
         this.clickArea.inputEnabled = true;
         this.clickArea.events.onInputDown.add(this.onClick, this);
@@ -108935,6 +108986,173 @@ class LootNavigator {
     }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = LootNavigator;
+
+
+/***/ }),
+/* 18 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__state__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__defs__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__utils__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__components_NameDialog__ = __webpack_require__(19);
+
+
+
+
+
+
+let newGameButton;
+let continueButton;
+let leaderboardButton;
+
+const outlineTextStyle = {
+    "font": "Verdana",
+    fill: "#FFF",
+    stroke: "#222",
+    strokeThickness: 10,
+    fontSize: "80px",
+    fontWeight: "bold"
+};
+
+/* harmony default export */ __webpack_exports__["a"] = ({
+    init: () => {
+        var newGameBmd = __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.bitmapData(__WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH * 0.9, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT * 0.4, 'newGameButton', true);
+        newGameBmd.ctx.fillStyle = "#AAC";
+        newGameBmd.ctx.strokeStyle = "#333";
+        newGameBmd.ctx.lineWidth = 10;
+        __WEBPACK_IMPORTED_MODULE_3__utils__["a" /* default */].DrawRoundedRect(newGameBmd.ctx, 0, 0, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH * 0.9, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT * 0.4, 20);
+
+        var continueBmd = __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.bitmapData(__WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH * 0.9, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT * 0.4, 'continueButton', true);
+        continueBmd.ctx.fillStyle = "#AAC";
+        continueBmd.ctx.strokeStyle = "#333";
+        continueBmd.ctx.lineWidth = 10;
+        __WEBPACK_IMPORTED_MODULE_3__utils__["a" /* default */].DrawRoundedRect(continueBmd.ctx, 0, 0, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH * 0.9, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT * 0.4, 20);
+
+        var leaderboardBmd = __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.bitmapData(__WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH * 0.9, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT * 0.1, 'leaderboardButton', true);
+        leaderboardBmd.ctx.fillStyle = "#AAC";
+        leaderboardBmd.ctx.strokeStyle = "#333";
+        leaderboardBmd.ctx.lineWidth = 10;
+        __WEBPACK_IMPORTED_MODULE_3__utils__["a" /* default */].DrawRoundedRect(leaderboardBmd.ctx, 0, 0, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH * 0.9, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT * 0.1, 20);
+    },
+
+    preload: () => {
+    },
+
+    create: () => {
+        __WEBPACK_IMPORTED_MODULE_0__game__["default"].stage.backgroundColor = "#E5E5E5";
+        __WEBPACK_IMPORTED_MODULE_0__game__["default"].world.setBounds(0, 0, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH * 100, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT);
+
+        newGameButton = __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.sprite(__WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH * 0.05, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT * 0.025, __WEBPACK_IMPORTED_MODULE_0__game__["default"].cache.getBitmapData('newGameButton'));
+        continueButton = __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.sprite(__WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH * 0.05, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT * 0.45, __WEBPACK_IMPORTED_MODULE_0__game__["default"].cache.getBitmapData('continueButton'));
+        leaderboardButton = __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.sprite(__WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH * 0.05, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT * 0.875, __WEBPACK_IMPORTED_MODULE_0__game__["default"].cache.getBitmapData('leaderboardButton'));
+
+        newGameButton.addChild(new Phaser.Text(__WEBPACK_IMPORTED_MODULE_0__game__["default"], 50, 50, "New Game", outlineTextStyle));
+        continueButton.addChild(new Phaser.Text(__WEBPACK_IMPORTED_MODULE_0__game__["default"], 50, 50, "Continue", outlineTextStyle));
+        leaderboardButton.addChild(new Phaser.Text(__WEBPACK_IMPORTED_MODULE_0__game__["default"], 50, 50, "Leaderboard", outlineTextStyle));
+
+        newGameButton.inputEnabled = continueButton.inputEnabled = leaderboardButton.inputEnabled = true;
+        newGameButton.events.onInputDown.add(() => {
+            new __WEBPACK_IMPORTED_MODULE_4__components_NameDialog__["a" /* default */]((name) => {
+                __WEBPACK_IMPORTED_MODULE_1__state__["a" /* default */].name = name;
+                __WEBPACK_IMPORTED_MODULE_0__game__["default"].state.start("Main");
+            });
+        });
+
+        continueButton.events.onInputDown.add(() => {
+        });
+
+        leaderboardButton.events.onInputDown.add(() => {
+        });
+    },
+
+    update: () => {
+    },
+});
+
+/***/ }),
+/* 19 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__state__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__defs__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__utils__ = __webpack_require__(3);
+
+
+
+
+
+const WIDTH = __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH * 0.6;
+const HEIGHT = __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT * 0.25;
+
+class NameDialog {
+    constructor(onDone) {
+        this.name = "";
+
+        var dialogBmd = __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.bitmapData(WIDTH, HEIGHT, 'nameDialog', false);
+        dialogBmd.ctx.fillStyle = "#FFF";
+        dialogBmd.ctx.strokeStyle = "#222";
+        dialogBmd.ctx.lineWidth = 10;
+        __WEBPACK_IMPORTED_MODULE_3__utils__["a" /* default */].DrawRoundedRect(dialogBmd.ctx, 0, 0, WIDTH, HEIGHT, 30);
+        dialogBmd.ctx.beginPath();
+        dialogBmd.ctx.moveTo(50, HEIGHT * 0.57);
+        dialogBmd.ctx.lineTo(WIDTH - 50, HEIGHT * 0.57);
+        dialogBmd.ctx.stroke();
+
+        this.dialog = __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.sprite(__WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH / 2, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT / 2, dialogBmd);
+        this.dialog.anchor.set(0.5);
+        this.dialog.addChild(new Phaser.Text(__WEBPACK_IMPORTED_MODULE_0__game__["default"], 0, -HEIGHT / 2 + 110, "Enter your name:", {
+            "font": "Verdana",
+            fill: "#111",
+            fontSize: "70px"
+        })).anchor.set(0.5);
+
+        this.nameText = this.dialog.addChild(new Phaser.Text(__WEBPACK_IMPORTED_MODULE_0__game__["default"], 0, -20, this.name, {
+            "font": "Verdana",
+            fill: "#111",
+            fontSize: "70px",
+            fontWeight: "bold"
+        }));
+        this.nameText.anchor.set(0.5);
+
+        var buttonBmd = __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.bitmapData(WIDTH * 0.9, HEIGHT * 0.3, 'nameDialog', false);
+        buttonBmd.ctx.fillStyle = "#DDD";
+        buttonBmd.ctx.strokeStyle = "#222";
+        buttonBmd.ctx.lineWidth = 7;
+        __WEBPACK_IMPORTED_MODULE_3__utils__["a" /* default */].DrawRoundedRect(buttonBmd.ctx, 0, 0, WIDTH * 0.9, HEIGHT * 0.3, 30);
+        this.continueButton = this.dialog.addChild(new Phaser.Sprite(__WEBPACK_IMPORTED_MODULE_0__game__["default"], 0, (HEIGHT / 2) * 0.6, buttonBmd));
+        this.continueButton.anchor.set(0.5);
+        this.continueButton.inputEnabled = true;
+        this.continueButton.events.onInputDown.add(() => {
+            onDone(this.name);
+        });
+
+        this.continueButton.addChild(new Phaser.Text(__WEBPACK_IMPORTED_MODULE_0__game__["default"], 0, 0, "Continue", {
+            "font": "Verdana",
+            fill: "#222",
+            fontSize: "70px",
+            fontWeight: "bold"
+        })).anchor.set(0.5);
+
+        __WEBPACK_IMPORTED_MODULE_0__game__["default"].input.keyboard.addCallbacks(this, this.onDownCallback);
+    }
+
+    onDownCallback(evt) {
+        if (this.dialog.visible) {
+            if (evt.keyCode >= 65 && evt.keyCode <= 90) { // A-Z
+                this.name += String.fromCharCode(evt.keyCode);
+            } else if (evt.keyCode == 8) { // backspace
+                this.name = this.name.slice(0, this.name.length-1);
+            }
+            this.nameText.text = this.name;
+        }
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = NameDialog;
 
 
 /***/ })

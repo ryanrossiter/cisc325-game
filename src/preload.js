@@ -3,6 +3,11 @@ import Defs from './defs';
 
 let loadPromises = [];
 export default {
+    init: () => {
+        game.scale.scaleMode = Phaser.ScaleManager.USER_SCALE;
+        game.scale.setUserScale(Defs.SCALE_RATIO, Defs.SCALE_RATIO);
+    },
+    
     preload: () => {
         // Create sprites that are defined by pixel arrays in Defs.PIXEL_SPRITES
         for (const spriteName in Defs.PIXEL_SPRITES) {
@@ -40,7 +45,7 @@ export default {
             }
 
             // switch to next state
-            game.state.start("Main");
+            game.state.start("MainMenu");
         });
     },
 }

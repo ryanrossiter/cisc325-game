@@ -57,7 +57,7 @@ export default {
         newGameButton.events.onInputDown.add(() => {
             new NameDialog((name) => {
                 State.name = name;
-                game.state.start("Main");
+                game.state.start("JourneySelect");
             });
         });
 

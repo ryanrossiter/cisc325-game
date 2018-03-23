@@ -30,12 +30,31 @@ const labelTextStyle = {
     fontSize: "70px"
 };
 
+const continueTextStyle = {
+    "font": "Verdana",
+    fill: "#111",
+    fontSize: "120px",
+    fontWeight: "bold"
+};
+
 export default {
     create: () => {
         game.stage.backgroundColor = "#E5E5E5";
         game.world.setBounds(0, 0, Defs.GAME_WIDTH * 100, Defs.GAME_HEIGHT);
 
         game.add.text(Defs.GAME_WIDTH / 2, 120, "Start A New Journey!", titleTextStyle).anchor.set(0.5);
+
+        var continueButton = new Button(Defs.GAME_WIDTH / 2, Defs.GAME_HEIGHT * 0.925, Defs.GAME_WIDTH * 0.925, 270);
+        continueButton.disabled = true;
+        continueButton.onChange = (pressed) => {
+            if (pressed) {
+                game.state.start("Main");
+            }
+        };
+
+        continueButton.sprite.addChild(new Phaser.Text(game, 0, 0, "CONTINUE", continueTextStyle)).anchor.set(0.5);
+
+        let numSelected = 0;
         let data = [
             {
                 label: 'DIFFICULTY',
@@ -72,7 +91,7 @@ export default {
             for (var i = 0; i < n; i++) {
                 let btn = d.buttons[i] = new Button(Defs.GAME_WIDTH / n * (i + 0.5), y * 500 + 520);
                 btn.toggle = true;
-                btn.allowDisable = false;
+                btn.allowDepress = false;
                 btn.index = i;
                 btn.onChange = (pressed) => {
                     if (pressed) {
@@ -82,6 +101,11 @@ export default {
 
                         State[d.prop] = d.options[btn.index];
                         d.selected = btn.index;
+                    }
+
+                    numSelected += (pressed? 1:-1);
+                    if (numSelected === data.length) {
+                        continueButton.disabled = false;
                     }
                 };
 

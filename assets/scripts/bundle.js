@@ -69,18 +69,19 @@
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_expose_loader_PIXI_phaser_ce_build_custom_pixi_js__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_expose_loader_PIXI_phaser_ce_build_custom_pixi_js__ = __webpack_require__(8);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_expose_loader_PIXI_phaser_ce_build_custom_pixi_js___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_expose_loader_PIXI_phaser_ce_build_custom_pixi_js__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_expose_loader_p2_phaser_ce_build_custom_p2_js__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_expose_loader_p2_phaser_ce_build_custom_p2_js__ = __webpack_require__(10);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_expose_loader_p2_phaser_ce_build_custom_p2_js___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_expose_loader_p2_phaser_ce_build_custom_p2_js__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_expose_loader_Phaser_phaser_ce_build_custom_phaser_split_js__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_expose_loader_Phaser_phaser_ce_build_custom_phaser_split_js__ = __webpack_require__(12);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_expose_loader_Phaser_phaser_ce_build_custom_phaser_split_js___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_expose_loader_Phaser_phaser_ce_build_custom_phaser_split_js__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__preload__ = __webpack_require__(13);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__main__ = __webpack_require__(14);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__preload__ = __webpack_require__(15);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__main__ = __webpack_require__(16);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__defs__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__menus_main_menu__ = __webpack_require__(18);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__menus_journey_select__ = __webpack_require__(20);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__menus_title__ = __webpack_require__(22);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__menus_main_menu__ = __webpack_require__(20);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__menus_gear_select__ = __webpack_require__(22);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__menus_journey_select__ = __webpack_require__(25);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__menus_title__ = __webpack_require__(26);
 
 /**
  * Import Phaser dependencies using `expose-loader`.
@@ -100,13 +101,15 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 
+
 const game = new __WEBPACK_IMPORTED_MODULE_2_expose_loader_Phaser_phaser_ce_build_custom_phaser_split_js___default.a.Game(__WEBPACK_IMPORTED_MODULE_5__defs__["a" /* default */].GAME_WIDTH, __WEBPACK_IMPORTED_MODULE_5__defs__["a" /* default */].GAME_HEIGHT, __WEBPACK_IMPORTED_MODULE_2_expose_loader_Phaser_phaser_ce_build_custom_phaser_split_js___default.a.AUTO, 'phaser-parent');
 
 game.state.add("Preload", __WEBPACK_IMPORTED_MODULE_3__preload__["a" /* default */]);
 game.state.add("Main", __WEBPACK_IMPORTED_MODULE_4__main__["a" /* default */]);
-game.state.add("Title", __WEBPACK_IMPORTED_MODULE_8__menus_title__["a" /* default */]);
+game.state.add("Title", __WEBPACK_IMPORTED_MODULE_9__menus_title__["a" /* default */]);
 game.state.add("MainMenu", __WEBPACK_IMPORTED_MODULE_6__menus_main_menu__["a" /* default */]);
-game.state.add("JourneySelect", __WEBPACK_IMPORTED_MODULE_7__menus_journey_select__["a" /* default */]);
+game.state.add("JourneySelect", __WEBPACK_IMPORTED_MODULE_8__menus_journey_select__["a" /* default */]);
+game.state.add("GearSelect", __WEBPACK_IMPORTED_MODULE_7__menus_gear_select__["a" /* default */]);
 game.state.start("Preload");
 
 /* harmony default export */ __webpack_exports__["default"] = (game);
@@ -121,7 +124,21 @@ const MSR = 4; // max scale ratio
 const GAME_WIDTH = 360 * MSR;
 const GAME_HEIGHT = 640 * MSR;
 
+const LEVEL_TYPES = { // flag to indicate theme ex.
+    NORMAL: 0,
+    TOWER: 1,
+    OUTSIDE: 2,
+};
+
+const ITEM_TYPES = {
+    MAGIC: 0,
+    RANGED: 1,
+    MELEE: 2,
+    ABILITY: 3,
+};
+
 /* harmony default export */ __webpack_exports__["a"] = ({
+    MSR,
     GAME_WIDTH,
     GAME_HEIGHT,
     SCALE_RATIO: window.devicePixelRatio / MSR, // 3.5 is the max scale ratio
@@ -133,23 +150,86 @@ const GAME_HEIGHT = 640 * MSR;
     FLOOR_HEIGHT: GAME_HEIGHT * 0.2,
 
     ITEMS: {
-        0: {
-            sprite: 'item'
+        WOODEN_SWORD: {
+            name: "Wooden Sword",
+            type: ITEM_TYPES.MELEE,
+            sprite: 'item',
+            cost: 150,
+            damage: 30,
         },
-        1: {
-            sprite: 'item'
+        STEEL_SWORD: {
+            name: "Steel Sword",
+            type: ITEM_TYPES.MELEE,
+            sprite: 'item',
+            cost: 400,
+            damage: 50,
+        },
+        WAND: {
+            name: "Wand",
+            type: ITEM_TYPES.MAGIC,
+            sprite: 'item',
+            damage: 50,
+            cost: 500,
+            mpCost: 10,
         }
     },
 
     ENEMIES: {
-        0: {
+        NORMAL: { // maybe add other stats like def?
             sprite: 'enemy',
-            health: 10,
+            health: 90,
             drop_rates: {
-                0: 0.1
+                // key: item key, value: % chance of dropping
+                "STEEL_SWORD": 0.05,
+                "WOODEN_SWORD": 0.33,
             }
-        }
+        },
+        STRONGER: { // maybe add other stats like def?
+            sprite: 'enemy',
+            health: 150,
+            drop_rates: {
+                "STEEL_SWORD": 0.25,
+                "WAND": 0.1,
+            }
+        },
     },
+
+    LEVEL_TYPES,
+    LEVELS: [
+        {
+            type: LEVEL_TYPES.NORMAL,
+            length: 1, // Whatever 1 default length is
+            enemySpawns: [
+                {
+                    type: "NORMAL",
+                    // or maybe location: {x: 0, y: 0}
+                    quantity: 15,
+                    healthMultiplier: 1,
+                    //spawnMethod: SPAWN_METHODS.RANDOM
+                }
+            ]
+        },
+        {
+            type: LEVEL_TYPES.NORMAL,
+            length: 1.2,
+            enemySpawns: [
+                {
+                    type: "NORMAL",
+                    // or maybe location: {x: 0, y: 0}
+                    quantity: 30,
+                    healthMultiplier: 1,
+                    //spawnMethod: SPAWN_METHODS.RANDOM
+                },
+                {
+                    type: "STRONGER",
+                    // or maybe location: {x: 0, y: 0}
+                    quantity: 3,
+                    healthMultiplier: 1,
+                    //spawnMethod: SPAWN_METHODS.RANDOM
+                }
+            ]
+        }
+    ],
 
     SPRITESHEETS: {
         '_test_spritesheet': {
@@ -160,7 +240,7 @@ const GAME_HEIGHT = 640 * MSR;
     },
 
     SPRITES: {
-        'title': '/assets/img/title.png',
+        'title': 'assets/img/title.png',
     },
 
     PIXEL_SPRITES: {
@@ -342,13 +422,127 @@ class Mob {
 
 /***/ }),
 /* 6 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-/* WEBPACK VAR INJECTION */(function(global) {module.exports = global["PIXI"] = __webpack_require__(7);
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__state__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__defs__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__utils__ = __webpack_require__(3);
+
+
+
+
+
+const WIDTH = __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH * 0.22;
+const HEIGHT = WIDTH;
+
+class Button {
+    constructor(x, y, w=WIDTH, h=HEIGHT, disabled=false, toggle=false, allowDepress=true) {
+        this.toggle = toggle;
+        this.allowDepress = allowDepress;
+        this.pressed = false;
+
+        var buttonBmd = __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.bitmapData(w, h, 'newGameButton', true);
+        buttonBmd.ctx.fillStyle = "#CCCCD0";
+        buttonBmd.ctx.strokeStyle = "#333";
+        buttonBmd.ctx.lineWidth = 10;
+        __WEBPACK_IMPORTED_MODULE_3__utils__["a" /* default */].DrawRoundedRect(buttonBmd.ctx, 0, 0, w, h, 20);
+        this.sprite = __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.sprite(x, y, buttonBmd);
+        this.sprite.anchor.set(0.5);
+        this.sprite.inputEnabled = true;
+        this.sprite.events.onInputDown.add(() => this.onInputDown());
+        this.sprite.events.onInputUp.add(() => this.onInputUp());
+    }
+
+    set disabled(d) {
+        this.isDisabled = d;
+        this.sprite.tint = (this.isDisabled? (this.pressed? 0x777777 : 0x999999) : (this.pressed? 0xCCCCCC : 0xFFFFFF));
+    }
+
+    onChange(pressed) {} // override
+
+    setPressed(pressed) {
+        this.pressed = pressed;
+        this.sprite.tint = (this.pressed? 0xCCCCCC : 0xFFFFFF);
+        this.onChange(pressed);
+    }
+
+    onInputDown() {
+        if (this.isDisabled) return;
+        if (!this.pressed || this.allowDepress) this.setPressed(!this.pressed);
+    }
+
+    onInputUp() {
+        if (this.isDisabled) return;
+        if (!this.toggle) this.setPressed(false);
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = Button;
+
 
 /***/ }),
 /* 7 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__defs__ = __webpack_require__(1);
+
+
+
+const DESELECTED_BG_ALPHA = 0.05;
+const SELECTED_BG_ALPHA = 0.2;
+const WIDTH = __WEBPACK_IMPORTED_MODULE_1__defs__["a" /* default */].GAME_WIDTH * 0.9;
+const HEIGHT = 200;
+
+class InfoRow {
+    constructor(parentGroup, group, x, y) {
+        this.selected = false;
+
+        this.group = parentGroup.add(new Phaser.Group(__WEBPACK_IMPORTED_MODULE_0__game__["default"], null));
+        this.group.x = x;
+        this.group.y = y;
+        this.innerGroup = group;
+        this.group.add(this.innerGroup);
+        this.innerGroup.x = -WIDTH / 2;
+
+        this.background = this.innerGroup.add(new Phaser.Sprite(__WEBPACK_IMPORTED_MODULE_0__game__["default"], 0, 0, 'blank'));
+        this.background.width = WIDTH;
+        this.background.height = HEIGHT;
+        this.background.tint = 0x000000;
+        this.background.alpha = 0.05;
+
+        let borderBottom = this.innerGroup.add(new Phaser.Sprite(__WEBPACK_IMPORTED_MODULE_0__game__["default"], 0, HEIGHT, 'blank'));
+        borderBottom.width = WIDTH;
+        borderBottom.height = __WEBPACK_IMPORTED_MODULE_1__defs__["a" /* default */].MSR;
+        borderBottom.tint = 0x777777
+    }
+
+    setSelected(s) {
+        this.selected = s;
+        this.background.alpha = (this.selected? SELECTED_BG_ALPHA : DESELECTED_BG_ALPHA);
+    }
+
+    onInputUp() {
+        this.setSelected(!this.selected);
+    }
+}
+
+InfoRow.WIDTH = WIDTH;
+InfoRow.HEIGHT = HEIGHT;
+
+/* harmony default export */ __webpack_exports__["a"] = (InfoRow);
+
+/***/ }),
+/* 8 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(global) {module.exports = global["PIXI"] = __webpack_require__(9);
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
+
+/***/ }),
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /**
@@ -7912,14 +8106,14 @@ PIXI.TextureUvs = function()
 }).call(this);
 
 /***/ }),
-/* 8 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
-/* WEBPACK VAR INJECTION */(function(global) {module.exports = global["p2"] = __webpack_require__(9);
+/* WEBPACK VAR INJECTION */(function(global) {module.exports = global["p2"] = __webpack_require__(11);
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
 
 /***/ }),
-/* 9 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var require;var require;/**
@@ -21546,14 +21740,14 @@ World.prototype.raycast = function(result, ray){
 
 
 /***/ }),
-/* 10 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
-/* WEBPACK VAR INJECTION */(function(global) {module.exports = global["Phaser"] = __webpack_require__(11);
+/* WEBPACK VAR INJECTION */(function(global) {module.exports = global["Phaser"] = __webpack_require__(13);
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
 
 /***/ }),
-/* 11 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(process) {/**
@@ -108320,10 +108514,10 @@ PIXI.canUseNewCanvasBlendModes = function () {
 * "What matters in this life is not what we do but what we do for others, the legacy we leave and the imprint we make." - Eric Meyer
 */
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(12)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(14)))
 
 /***/ }),
-/* 12 */
+/* 14 */
 /***/ (function(module, exports) {
 
 // shim for using process in browser
@@ -108513,7 +108707,7 @@ process.umask = function() { return 0; };
 
 
 /***/ }),
-/* 13 */
+/* 15 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -108580,7 +108774,7 @@ let loadPromises = [];
 
 
 /***/ }),
-/* 14 */
+/* 16 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -108588,9 +108782,9 @@ let loadPromises = [];
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__state__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__defs__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__utils__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__player__ = __webpack_require__(15);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__enemy__ = __webpack_require__(16);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__lootnavigator__ = __webpack_require__(17);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__player__ = __webpack_require__(17);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__enemy__ = __webpack_require__(18);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__lootnavigator__ = __webpack_require__(19);
 
 
 
@@ -108633,9 +108827,9 @@ let combatKeyTexts;
         enemies = [];
         enemiesInCombat = new Array(ENEMY_COMBAT_POSITIONS);
 
-        enemies.push(new __WEBPACK_IMPORTED_MODULE_5__enemy__["a" /* default */](__WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH - 500, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT * 0.7, 0));
-        enemies.push(new __WEBPACK_IMPORTED_MODULE_5__enemy__["a" /* default */](__WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH - 600, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT * 0.7 + 50, 0));
-        enemies.push(new __WEBPACK_IMPORTED_MODULE_5__enemy__["a" /* default */](__WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH - 550, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT * 0.7 - 100, 0));
+        enemies.push(new __WEBPACK_IMPORTED_MODULE_5__enemy__["a" /* default */](__WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH - 500, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT * 0.7, "NORMAL"));
+        enemies.push(new __WEBPACK_IMPORTED_MODULE_5__enemy__["a" /* default */](__WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH - 600, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT * 0.7 + 50, "NORMAL"));
+        enemies.push(new __WEBPACK_IMPORTED_MODULE_5__enemy__["a" /* default */](__WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH - 550, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT * 0.7 - 100, "NORMAL"));
 
         // add after enemies to keep on top, alternatively create a UI group that appears over top
         combatKeyTexts = [];
@@ -108768,7 +108962,7 @@ let combatKeyTexts;
 });
 
 /***/ }),
-/* 15 */
+/* 17 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -108827,7 +109021,7 @@ class Player extends __WEBPACK_IMPORTED_MODULE_3__mob__["a" /* default */] {
 
 
 /***/ }),
-/* 16 */
+/* 18 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -108889,7 +109083,7 @@ class Enemy extends __WEBPACK_IMPORTED_MODULE_3__mob__["a" /* default */] {
 
 
 /***/ }),
-/* 17 */
+/* 19 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -108994,7 +109188,7 @@ class LootNavigator {
 
 
 /***/ }),
-/* 18 */
+/* 20 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -109002,7 +109196,7 @@ class LootNavigator {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__state__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__defs__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__utils__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__components_NameDialog__ = __webpack_require__(19);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__components_NameDialog__ = __webpack_require__(21);
 
 
 
@@ -109062,7 +109256,7 @@ const outlineTextStyle = {
         newGameButton.events.onInputDown.add(() => {
             new __WEBPACK_IMPORTED_MODULE_4__components_NameDialog__["a" /* default */]((name) => {
                 __WEBPACK_IMPORTED_MODULE_1__state__["a" /* default */].name = name;
-                __WEBPACK_IMPORTED_MODULE_0__game__["default"].state.start("Main");
+                __WEBPACK_IMPORTED_MODULE_0__game__["default"].state.start("JourneySelect");
             });
         });
 
@@ -109078,7 +109272,7 @@ const outlineTextStyle = {
 });
 
 /***/ }),
-/* 19 */
+/* 21 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -109161,7 +109355,7 @@ class NameDialog {
 
 
 /***/ }),
-/* 20 */
+/* 22 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -109169,7 +109363,13 @@ class NameDialog {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__state__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__defs__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__utils__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__components_Button__ = __webpack_require__(21);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__components_Button__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__components_GroupSwipe__ = __webpack_require__(23);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__components_InfoRow__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__components_ItemInfo__ = __webpack_require__(24);
+
+
+
 
 
 
@@ -109202,12 +109402,330 @@ const labelTextStyle = {
     fontSize: "70px"
 };
 
+const startTextStyle = {
+    "font": "Verdana",
+    fill: "#FFF",
+    stroke: "#222",
+    strokeThickness: 14,
+    fontSize: "100px",
+    fontWeight: "bold"
+};
+
+const SCROLL_BOX_WIDTH = __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH * 0.9;
+const SCROLL_BOX_HEIGHT = __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT * 0.275;
+
+const STARTING_MONEY = 1000;
+
+let equipmentGroupSwipe;
+let skillsGroupSwipe;
+let moneyText;
+let remainingMoney;
+
+/* harmony default export */ __webpack_exports__["a"] = ({
+    init: () => {
+        var scrollBoxBmd = __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.bitmapData(SCROLL_BOX_WIDTH * 1.02, SCROLL_BOX_HEIGHT * 1.02, 'scrollBoxBg', true);
+        scrollBoxBmd.ctx.fillStyle = "#EEEEF0";
+        scrollBoxBmd.ctx.strokeStyle = "#333";
+        scrollBoxBmd.ctx.lineWidth = __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].MSR;
+        __WEBPACK_IMPORTED_MODULE_3__utils__["a" /* default */].DrawRoundedRect(scrollBoxBmd.ctx, 0, 0, SCROLL_BOX_WIDTH * 1.02, SCROLL_BOX_HEIGHT * 1.02, 0);
+    },
+
+    create: () => {
+        remainingMoney = STARTING_MONEY;
+
+        __WEBPACK_IMPORTED_MODULE_0__game__["default"].stage.backgroundColor = "#F5F5F5";
+        __WEBPACK_IMPORTED_MODULE_0__game__["default"].world.setBounds(0, 0, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH * 100, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT);
+
+        __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.text(__WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH / 2, 120, "Gear Up Your Character!", titleTextStyle).anchor.set(0.5);
+
+        var startButton = new __WEBPACK_IMPORTED_MODULE_4__components_Button__["a" /* default */](__WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH / 2, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT * 0.925, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH * 0.925, 270);
+        startButton.onChange = (pressed) => {
+            if (pressed) {
+                __WEBPACK_IMPORTED_MODULE_0__game__["default"].state.start("Main");
+            }
+        };
+
+        startButton.sprite.addChild(new Phaser.Text(__WEBPACK_IMPORTED_MODULE_0__game__["default"], 0, 0, "START!!", startTextStyle)).anchor.set(0.5);
+
+        // create equipment selector
+        __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.text(30, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT * 0.1, "EQUIPMENT", outlineTextStyle);
+        moneyText = __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.text(__WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH * 0.9, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT * 0.1, remainingMoney + "g", labelTextStyle);
+        moneyText.anchor.set(1, 0);
+        let equipmentOptions = Object.values(__WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].ITEMS);
+        let equipmentGroup = __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.group();
+        equipmentGroup.x = __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH / 2;
+        equipmentGroup.y = __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT * 0.175;
+        equipmentGroup.add(new Phaser.Sprite(__WEBPACK_IMPORTED_MODULE_0__game__["default"], 0, -SCROLL_BOX_HEIGHT * 0.01, __WEBPACK_IMPORTED_MODULE_0__game__["default"].cache.getBitmapData('scrollBoxBg'))).anchor.set(0.5, 0);
+        let equipmentScrollGroup = equipmentGroup.add(new Phaser.Group(__WEBPACK_IMPORTED_MODULE_0__game__["default"], null));
+
+        let equipmentRows = [];
+        for (var i = 0; i < equipmentOptions.length; i++) {
+            var itemInfo = new __WEBPACK_IMPORTED_MODULE_7__components_ItemInfo__["a" /* default */](equipmentOptions[i]);
+            equipmentRows.push(new __WEBPACK_IMPORTED_MODULE_6__components_InfoRow__["a" /* default */](equipmentScrollGroup, itemInfo.group, 0, i * __WEBPACK_IMPORTED_MODULE_6__components_InfoRow__["a" /* default */].HEIGHT));
+        }
+
+        equipmentGroupSwipe = new __WEBPACK_IMPORTED_MODULE_5__components_GroupSwipe__["a" /* default */](equipmentGroup, equipmentScrollGroup, SCROLL_BOX_WIDTH, SCROLL_BOX_HEIGHT, false, true,
+            __WEBPACK_IMPORTED_MODULE_6__components_InfoRow__["a" /* default */].HEIGHT, equipmentOptions.length, (dist, incrementPressed) => {
+                if (dist === 0 && incrementPressed < equipmentRows.length) {
+                    let allowToggle = true;
+                    if (!equipmentRows[incrementPressed].selected && remainingMoney < equipmentOptions[incrementPressed].cost) {
+                        allowToggle = false;
+                    }
+
+                    if (allowToggle) {
+                        equipmentRows[incrementPressed].onInputUp();
+                        if (equipmentRows[incrementPressed].selected) {
+                            remainingMoney -= equipmentOptions[incrementPressed].cost;
+                        } else {
+                            remainingMoney += equipmentOptions[incrementPressed].cost;
+                        }
+
+                        moneyText.text = remainingMoney + "g";
+                    }
+                }
+            }
+        );
+        equipmentGroupSwipe.setSwipeBoxAnchor(0.5, 0);
+
+        // create skill selector
+        __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.text(30, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT * 0.5, "SKILLS", outlineTextStyle);
+        let skillOptions = [];
+        let skillsGroup = __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.group();
+        skillsGroup.x = __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH / 2;
+        skillsGroup.y = __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT * 0.575;
+        skillsGroup.add(new Phaser.Sprite(__WEBPACK_IMPORTED_MODULE_0__game__["default"], 0, -SCROLL_BOX_HEIGHT * 0.01, __WEBPACK_IMPORTED_MODULE_0__game__["default"].cache.getBitmapData('scrollBoxBg'))).anchor.set(0.5, 0);
+        let skillsScrollGroup = skillsGroup.add(new Phaser.Group(__WEBPACK_IMPORTED_MODULE_0__game__["default"], null));
+
+        let skillRows = [];
+        for (var i = 0; i < skillOptions.length; i++) {
+            skillRows.push(new __WEBPACK_IMPORTED_MODULE_6__components_InfoRow__["a" /* default */](skillsScrollGroup, 0, i * __WEBPACK_IMPORTED_MODULE_6__components_InfoRow__["a" /* default */].HEIGHT));
+        }
+
+        skillsGroupSwipe = new __WEBPACK_IMPORTED_MODULE_5__components_GroupSwipe__["a" /* default */](skillsGroup, skillsScrollGroup, SCROLL_BOX_WIDTH, SCROLL_BOX_HEIGHT, false, true,
+            __WEBPACK_IMPORTED_MODULE_6__components_InfoRow__["a" /* default */].HEIGHT, skillOptions.length, (dist, incrementPressed) => {
+                if (dist === 0 && incrementPressed < skillRows.length) {
+                    skillRows[incrementPressed].onInputUp();
+                }
+            }
+        );
+        skillsGroupSwipe.setSwipeBoxAnchor(0.5, 0);
+    },
+
+    update: () => {
+        equipmentGroupSwipe.update();
+        skillsGroupSwipe.update();
+    },
+});
+
+/***/ }),
+/* 23 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__state__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__defs__ = __webpack_require__(1);
+
+
+
+
+class GroupSwipe {
+    constructor(parentGroup, group, pageWidth, pageHeight, horizontal=false, maskPage=false, incrementSize=1, increments=null, dragCallback=(dist)=>{}) {
+        this.dragging = false;
+        this.pageWidth = pageWidth;
+        this.pageHeight = pageHeight;
+        this.horizontal = horizontal;
+        this.increments = increments || Math.floor((horizontal? pageWidth : pageHeight) / incrementSize);
+        this.incrementSize = incrementSize;
+        this.dragCallback = dragCallback;
+        this.group = group;
+        this.swipeBox = parentGroup.add(new Phaser.Sprite(__WEBPACK_IMPORTED_MODULE_0__game__["default"], 0, 0, 'blank'));
+        this.swipeBox.alpha = 0;
+        this.dragStartX = this.dragStartY = 0;
+
+        parentGroup.sendToBack(this.swipeBox);
+        this.swipeBox.width = pageWidth;
+        this.swipeBox.height = pageHeight;
+        this.maskPage = maskPage;
+        if (this.maskPage) {
+            this.pageMask = parentGroup.addChild(new Phaser.Graphics(__WEBPACK_IMPORTED_MODULE_0__game__["default"], 0, 0));
+            this.pageMask.beginFill(0xffffff);
+            this.pageMask.drawRect(0, 0, pageWidth, pageHeight);
+            group.mask = this.pageMask;
+        }
+
+        this.swipeBox.inputEnabled = true;
+        this.swipeBox.input.enableDrag();
+        this.swipeBox.input.setDragLock(this.horizontal, !this.horizontal); // disable vertical drag
+
+        this.swipeBox.events.onDragStart.add(this.onDragStart, this);
+        this.swipeBox.events.onDragStop.add(this.onDragStop, this);
+    }
+
+    setSwipeBoxAnchor(x, y) {
+        this.swipeBox.anchor.set(x, y);
+        if (this.maskPage) {
+            this.pageMask.x = -this.swipeBox.anchor.x * this.pageWidth;
+            this.pageMask.y = -this.swipeBox.anchor.y * this.pageHeight;
+        }
+    }
+
+    _setGroupPos() {
+        this.group.x = this.swipeBox.x + this.dragStartX;
+        this.group.y = this.swipeBox.y + this.dragStartY;
+
+        if (-this.group.x < 0) this.group.x = 0;
+        else if (Math.ceil(-this.group.x / this.incrementSize) >= this.increments) this.group.x = -(this.increments - 1) * this.incrementSize;
+
+        if (-this.group.y < 0) this.group.y = 0;
+        else if (Math.ceil(-this.group.y / this.incrementSize) >= this.increments) this.group.y = -(this.increments - 1) * this.incrementSize;
+    }
+
+    update() {
+        if (this.dragging) {
+            this._setGroupPos();
+        }
+    }
+
+    onDragStart() {
+        this.dragging = true;
+        this.dragStartX = this.group.x;
+        this.dragStartY = this.group.y;
+    }
+
+    onDragStop() {
+        this.dragging = false;
+        this._setGroupPos();
+        this.swipeBox.x = this.swipeBox.y = 0;
+
+        var off = 0, dist = 0, incrementPressed = 0;
+        if (this.horizontal) {
+            off = Math.round(this.group.x / this.incrementSize);
+            dist = Math.round(this.dragStartX / this.incrementSize) - off;
+            incrementPressed = Math.floor((this.swipeBox.input.globalToLocal(this.swipeBox.input.downPoint).x - this.group.x) / this.incrementSize);
+            __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.tween(this.group).to({ x: off * this.incrementSize }, 300, Phaser.Easing.Quadratic.Out).start();
+        } else {
+            off = Math.round(this.group.y / this.incrementSize);
+            dist = Math.round(this.dragStartY / this.incrementSize) - off;
+            incrementPressed = Math.floor((this.swipeBox.input.globalToLocal(this.swipeBox.input.downPoint).y - this.group.y) / this.incrementSize);
+            __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.tween(this.group).to({ y: off * this.incrementSize }, 300, Phaser.Easing.Quadratic.Out).start();
+        }
+
+        this.dragCallback(Math.abs(dist), incrementPressed);
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = GroupSwipe;
+
+
+/***/ }),
+/* 24 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__defs__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__InfoRow__ = __webpack_require__(7);
+
+
+
+
+const itemNameTextStyle = {
+    "font": "Verdana",
+    fill: "#111",
+    fontSize: "70px",
+    boundsAlignV: 'middle',
+    wordWrap: true,
+    wordWrapWidth: __WEBPACK_IMPORTED_MODULE_2__InfoRow__["a" /* default */].WIDTH * 0.6
+};
+
+const costTextStyle = {
+    "font": "Verdana",
+    fill: "#0A0A0A",
+    fontSize: "65px",
+    fontWeight: "bold"
+};
+
+class ItemInfo {
+    constructor(item) {
+        this.item = item;
+        this.group = new Phaser.Group(__WEBPACK_IMPORTED_MODULE_0__game__["default"], null);
+
+        this.group.addChild(new Phaser.Sprite(__WEBPACK_IMPORTED_MODULE_0__game__["default"], __WEBPACK_IMPORTED_MODULE_2__InfoRow__["a" /* default */].HEIGHT / 2, __WEBPACK_IMPORTED_MODULE_2__InfoRow__["a" /* default */].HEIGHT / 2, item.sprite)).anchor.set(0.5);
+        this.group.addChild(new Phaser.Text(__WEBPACK_IMPORTED_MODULE_0__game__["default"], 0, 0, item.name, itemNameTextStyle))
+            .setTextBounds(__WEBPACK_IMPORTED_MODULE_2__InfoRow__["a" /* default */].WIDTH * 0.175, 0, __WEBPACK_IMPORTED_MODULE_2__InfoRow__["a" /* default */].WIDTH * 0.6, __WEBPACK_IMPORTED_MODULE_2__InfoRow__["a" /* default */].HEIGHT);
+        this.group.addChild(new Phaser.Text(__WEBPACK_IMPORTED_MODULE_0__game__["default"], __WEBPACK_IMPORTED_MODULE_2__InfoRow__["a" /* default */].WIDTH * 0.95, __WEBPACK_IMPORTED_MODULE_2__InfoRow__["a" /* default */].HEIGHT / 2, item.cost + "g", costTextStyle)).anchor.set(1, 0.5);
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = ItemInfo;
+
+
+/***/ }),
+/* 25 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__state__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__defs__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__utils__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__components_Button__ = __webpack_require__(6);
+
+
+
+
+
+
+let newGameButton;
+let continueButton;
+let leaderboardButton;
+
+const titleTextStyle = {
+    "font": "Verdana",
+    fill: "#111",
+    fontSize: "80px",
+    fontWeight: "bold"
+};
+
+const outlineTextStyle = {
+    "font": "Verdana",
+    fill: "#FFF",
+    stroke: "#222",
+    strokeThickness: 10,
+    fontSize: "80px",
+    fontWeight: "bold"
+};
+
+const labelTextStyle = {
+    "font": "Verdana",
+    fill: "#111",
+    fontSize: "70px"
+};
+
+const continueTextStyle = {
+    "font": "Verdana",
+    fill: "#111",
+    fontSize: "120px",
+    fontWeight: "bold"
+};
+
 /* harmony default export */ __webpack_exports__["a"] = ({
     create: () => {
-        __WEBPACK_IMPORTED_MODULE_0__game__["default"].stage.backgroundColor = "#E5E5E5";
+        __WEBPACK_IMPORTED_MODULE_0__game__["default"].stage.backgroundColor = "#F5F5F5";
         __WEBPACK_IMPORTED_MODULE_0__game__["default"].world.setBounds(0, 0, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH * 100, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT);
 
         __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.text(__WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH / 2, 120, "Start A New Journey!", titleTextStyle).anchor.set(0.5);
+
+        var continueButton = new __WEBPACK_IMPORTED_MODULE_4__components_Button__["a" /* default */](__WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH / 2, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT * 0.925, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH * 0.925, 270);
+        continueButton.disabled = true;
+        continueButton.onChange = (pressed) => {
+            if (pressed) {
+                __WEBPACK_IMPORTED_MODULE_0__game__["default"].state.start("GearSelect");
+            }
+        };
+
+        continueButton.sprite.addChild(new Phaser.Text(__WEBPACK_IMPORTED_MODULE_0__game__["default"], 0, 0, "CONTINUE", continueTextStyle)).anchor.set(0.5);
+
+        let numSelected = 0;
         let data = [
             {
                 label: 'DIFFICULTY',
@@ -109244,7 +109762,7 @@ const labelTextStyle = {
             for (var i = 0; i < n; i++) {
                 let btn = d.buttons[i] = new __WEBPACK_IMPORTED_MODULE_4__components_Button__["a" /* default */](__WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH / n * (i + 0.5), y * 500 + 520);
                 btn.toggle = true;
-                btn.allowDisable = false;
+                btn.allowDepress = false;
                 btn.index = i;
                 btn.onChange = (pressed) => {
                     if (pressed) {
@@ -109254,6 +109772,11 @@ const labelTextStyle = {
 
                         __WEBPACK_IMPORTED_MODULE_1__state__["a" /* default */][d.prop] = d.options[btn.index];
                         d.selected = btn.index;
+                    }
+
+                    numSelected += (pressed? 1:-1);
+                    if (numSelected === data.length) {
+                        continueButton.disabled = false;
                     }
                 };
 
@@ -109268,61 +109791,7 @@ const labelTextStyle = {
 });
 
 /***/ }),
-/* 21 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__state__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__defs__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__utils__ = __webpack_require__(3);
-
-
-
-
-
-const WIDTH = __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH * 0.22;
-const HEIGHT = WIDTH;
-
-class Button {
-    constructor(x, y, w=WIDTH, h=HEIGHT, toggle=false, allowDisable=true) {
-        this.toggle = toggle;
-        this.allowDisable = allowDisable;
-        this.pressed = false;
-
-        var buttonBmd = __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.bitmapData(w, h, 'newGameButton', true);
-        buttonBmd.ctx.fillStyle = "#CCCCD0";
-        buttonBmd.ctx.strokeStyle = "#333";
-        buttonBmd.ctx.lineWidth = 10;
-        __WEBPACK_IMPORTED_MODULE_3__utils__["a" /* default */].DrawRoundedRect(buttonBmd.ctx, 0, 0, w, h, 20);
-        this.sprite = __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.sprite(x, y, buttonBmd);
-        this.sprite.anchor.set(0.5);
-        this.sprite.inputEnabled = true;
-        this.sprite.events.onInputDown.add(() => this.onInputDown());
-        this.sprite.events.onInputUp.add(() => this.onInputUp());
-    }
-
-    onChange(pressed) {} // override
-
-    setPressed(pressed) {
-        this.pressed = pressed;
-        this.sprite.tint = (this.pressed? 0xCCCCCC : 0xFFFFFF);
-        this.onChange(pressed);
-    }
-
-    onInputDown() {
-        if (!this.pressed || this.allowDisable) this.setPressed(!this.pressed);
-    }
-
-    onInputUp() {
-        if (!this.toggle) this.setPressed(false);
-    }
-}
-/* harmony export (immutable) */ __webpack_exports__["a"] = Button;
-
-
-/***/ }),
-/* 22 */
+/* 26 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";

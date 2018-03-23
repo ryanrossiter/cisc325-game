@@ -39,7 +39,7 @@ const continueTextStyle = {
 
 export default {
     create: () => {
-        game.stage.backgroundColor = "#E5E5E5";
+        game.stage.backgroundColor = "#F5F5F5";
         game.world.setBounds(0, 0, Defs.GAME_WIDTH * 100, Defs.GAME_HEIGHT);
 
         game.add.text(Defs.GAME_WIDTH / 2, 120, "Start A New Journey!", titleTextStyle).anchor.set(0.5);
@@ -48,7 +48,7 @@ export default {
         continueButton.disabled = true;
         continueButton.onChange = (pressed) => {
             if (pressed) {
-                game.state.start("Main");
+                game.state.start("GearSelect");
             }
         };
 

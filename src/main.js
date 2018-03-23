@@ -40,9 +40,9 @@ export default {
         enemies = [];
         enemiesInCombat = new Array(ENEMY_COMBAT_POSITIONS);
 
-        enemies.push(new Enemy(Defs.GAME_WIDTH - 500, Defs.GAME_HEIGHT * 0.7, 0));
-        enemies.push(new Enemy(Defs.GAME_WIDTH - 600, Defs.GAME_HEIGHT * 0.7 + 50, 0));
-        enemies.push(new Enemy(Defs.GAME_WIDTH - 550, Defs.GAME_HEIGHT * 0.7 - 100, 0));
+        enemies.push(new Enemy(Defs.GAME_WIDTH - 500, Defs.GAME_HEIGHT * 0.7, "NORMAL"));
+        enemies.push(new Enemy(Defs.GAME_WIDTH - 600, Defs.GAME_HEIGHT * 0.7 + 50, "NORMAL"));
+        enemies.push(new Enemy(Defs.GAME_WIDTH - 550, Defs.GAME_HEIGHT * 0.7 - 100, "NORMAL"));
 
         // add after enemies to keep on top, alternatively create a UI group that appears over top
         combatKeyTexts = [];

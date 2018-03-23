@@ -16,6 +16,7 @@ const ITEM_TYPES = {
 };
 
 export default {
+    MSR,
     GAME_WIDTH,
     GAME_HEIGHT,
     SCALE_RATIO: window.devicePixelRatio / MSR, // 3.5 is the max scale ratio
@@ -31,12 +32,14 @@ export default {
             name: "Wooden Sword",
             type: ITEM_TYPES.MELEE,
             sprite: 'item',
+            cost: 150,
             damage: 30,
         },
         STEEL_SWORD: {
             name: "Steel Sword",
             type: ITEM_TYPES.MELEE,
             sprite: 'item',
+            cost: 400,
             damage: 50,
         },
         WAND: {
@@ -44,6 +47,7 @@ export default {
             type: ITEM_TYPES.MAGIC,
             sprite: 'item',
             damage: 50,
+            cost: 500,
             mpCost: 10,
         }
     },
@@ -114,7 +118,7 @@ export default {
     },
 
     SPRITES: {
-        'title': '/assets/img/title.png',
+        'title': 'assets/img/title.png',
     },
 
     PIXEL_SPRITES: {

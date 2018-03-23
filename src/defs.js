@@ -26,32 +26,44 @@ export default {
     FLOOR_Y: GAME_HEIGHT * 0.5,
     FLOOR_HEIGHT: GAME_HEIGHT * 0.2,
 
-    ITEM_TYPES,
     ITEMS: {
-        0: {
-            name: "Good Ol' Bow",
-            type: ITEM_TYPES.RANGED,
-            sprite: 'item',
-            damage: 3,
-            //accuracy: 0.8,
-        },
-        // can also use names for items:
-        DEV_SWORD: {
-            name: "NO",
+        WOODEN_SWORD: {
+            name: "Wooden Sword",
             type: ITEM_TYPES.MELEE,
             sprite: 'item',
-            damage: 99,
-            //speed: 1, // maybe number of enemy turns until can attack again
+            damage: 30,
+        },
+        STEEL_SWORD: {
+            name: "Steel Sword",
+            type: ITEM_TYPES.MELEE,
+            sprite: 'item',
+            damage: 50,
+        },
+        WAND: {
+            name: "Wand",
+            type: ITEM_TYPES.MAGIC,
+            sprite: 'item',
+            damage: 50,
+            mpCost: 10,
         }
     },
 
     ENEMIES: {
         NORMAL: { // maybe add other stats like def?
             sprite: 'enemy',
-            health: 10,
+            health: 90,
             drop_rates: {
                 // key: item key, value: % chance of dropping
-                0: 0.1
+                "STEEL_SWORD": 0.05,
+                "WOODEN_SWORD": 0.33,
+            }
+        },
+        STRONGER: { // maybe add other stats like def?
+            sprite: 'enemy',
+            health: 150,
+            drop_rates: {
+                "STEEL_SWORD": 0.25,
+                "WAND": 0.1,
             }
         },
     },
@@ -60,10 +72,32 @@ export default {
     LEVELS: [
         {
             type: LEVEL_TYPES.NORMAL,
+            length: 1, // Whatever 1 default length is
             enemySpawns: [
                 {
-                    type: ENEMIES.NORMAL,
+                    type: "NORMAL",
+                    // or maybe location: {x: 0, y: 0}
                     quantity: 15,
+                    healthMultiplier: 1,
+                    //spawnMethod: SPAWN_METHODS.RANDOM
+                }
+            ]
+        },
+        {
+            type: LEVEL_TYPES.NORMAL,
+            length: 1.2,
+            enemySpawns: [
+                {
+                    type: "NORMAL",
+                    // or maybe location: {x: 0, y: 0}
+                    quantity: 30,
+                    healthMultiplier: 1,
+                    //spawnMethod: SPAWN_METHODS.RANDOM
+                },
+                {
+                    type: "STRONGER",
+                    // or maybe location: {x: 0, y: 0}
+                    quantity: 3,
                     healthMultiplier: 1,
                     //spawnMethod: SPAWN_METHODS.RANDOM
                 }

@@ -7,9 +7,9 @@ const WIDTH = Defs.GAME_WIDTH * 0.22;
 const HEIGHT = WIDTH;
 
 export default class Button {
-    constructor(x, y, w=WIDTH, h=HEIGHT, toggle=false, allowDisable=true) {
+    constructor(x, y, w=WIDTH, h=HEIGHT, disabled=false, toggle=false, allowDepress=true) {
         this.toggle = toggle;
-        this.allowDisable = allowDisable;
+        this.allowDepress = allowDepress;
         this.pressed = false;
 
         var buttonBmd = game.add.bitmapData(w, h, 'newGameButton', true);
@@ -24,6 +24,11 @@ export default class Button {
         this.sprite.events.onInputUp.add(() => this.onInputUp());
     }
 
+    set disabled(d) {
+        this.isDisabled = d;
+        this.sprite.tint = (this.isDisabled? (this.pressed? 0x777777 : 0x999999) : (this.pressed? 0xCCCCCC : 0xFFFFFF));
+    }
+
     onChange(pressed) {} // override
 
     setPressed(pressed) {
@@ -33,10 +38,12 @@ export default class Button {
     }
 
     onInputDown() {
-        if (!this.pressed || this.allowDisable) this.setPressed(!this.pressed);
+        if (this.isDisabled) return;
+        if (!this.pressed || this.allowDepress) this.setPressed(!this.pressed);
     }
 
     onInputUp() {
+        if (this.isDisabled) return;
         if (!this.toggle) this.setPressed(false);
     }
 }

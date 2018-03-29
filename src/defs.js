@@ -52,6 +52,16 @@ export default {
         }
     },
 
+    SKILLS: {
+        HEAL_BUFF: {
+            name: "Heal Buff",
+            desc: "Gain HP",
+            sprite: 'item',
+            cost: 5,
+            mpCost: 10,
+        }
+    },
+
     ENEMIES: {
         NORMAL: { // maybe add other stats like def?
             sprite: 'enemy',

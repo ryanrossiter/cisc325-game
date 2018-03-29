@@ -6,6 +6,7 @@ import Button from '../components/Button';
 import GroupSwipe from '../components/GroupSwipe';
 import InfoRow from '../components/InfoRow';
 import ItemInfo from '../components/ItemInfo';
+import SkillInfo from '../components/SkillInfo';
 
 let newGameButton;
 let continueButton;
@@ -46,11 +47,14 @@ const SCROLL_BOX_WIDTH = Defs.GAME_WIDTH * 0.9;
 const SCROLL_BOX_HEIGHT = Defs.GAME_HEIGHT * 0.275;
 
 const STARTING_MONEY = 1000;
+const STARTING_SP = 60;
 
 let equipmentGroupSwipe;
 let skillsGroupSwipe;
 let moneyText;
+let spText;
 let remainingMoney;
+let remainingSp;
 
 export default {
     init: () => {
@@ -63,6 +67,7 @@ export default {
 
     create: () => {
         remainingMoney = STARTING_MONEY;
+        remainingSp = STARTING_SP;
 
         game.stage.backgroundColor = "#F5F5F5";
         game.world.setBounds(0, 0, Defs.GAME_WIDTH * 100, Defs.GAME_HEIGHT);
@@ -120,7 +125,9 @@ export default {
 
         // create skill selector
         game.add.text(30, Defs.GAME_HEIGHT * 0.5, "SKILLS", outlineTextStyle);
-        let skillOptions = [];
+        spText = game.add.text(Defs.GAME_WIDTH * 0.9, Defs.GAME_HEIGHT * 0.5, remainingSp + "sp", labelTextStyle);
+        spText.anchor.set(1, 0);
+        let skillOptions = Object.values(Defs.SKILLS);
         let skillsGroup = game.add.group();
         skillsGroup.x = Defs.GAME_WIDTH / 2;
         skillsGroup.y = Defs.GAME_HEIGHT * 0.575;
@@ -129,13 +136,28 @@ export default {
 
         let skillRows = [];
         for (var i = 0; i < skillOptions.length; i++) {
-            skillRows.push(new InfoRow(skillsScrollGroup, 0, i * InfoRow.HEIGHT));
+            var skillInfo = new SkillInfo(skillOptions[i]);
+            skillRows.push(new InfoRow(skillsScrollGroup, skillInfo.group, 0, i * InfoRow.HEIGHT));
         }
 
         skillsGroupSwipe = new GroupSwipe(skillsGroup, skillsScrollGroup, SCROLL_BOX_WIDTH, SCROLL_BOX_HEIGHT, false, true,
             InfoRow.HEIGHT, skillOptions.length, (dist, incrementPressed) => {
                 if (dist === 0 && incrementPressed < skillRows.length) {
-                    skillRows[incrementPressed].onInputUp();
+                    let allowToggle = true;
+                    if (!skillRows[incrementPressed].selected && remainingSp < skillOptions[incrementPressed].cost) {
+                        allowToggle = false;
+                    }
+
+                    if (allowToggle) {
+                        skillRows[incrementPressed].onInputUp();
+                        if (skillRows[incrementPressed].selected) {
+                            remainingSp -= skillOptions[incrementPressed].cost;
+                        } else {
+                            remainingSp += skillOptions[incrementPressed].cost;
+                        }
+
+                        spText.text = remainingSp + "sp";
+                    }
                 }
             }
         );

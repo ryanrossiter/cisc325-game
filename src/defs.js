@@ -22,10 +22,9 @@ export default {
     SCALE_RATIO: window.devicePixelRatio / MSR, // 3.5 is the max scale ratio
     PIXEL_SIZE: 1, // Defines the size of pixels used to generate PIXEL_SPRITES
 
-    INITIAL_STATE: 'Title',
+    INITIAL_STATE: 'Main',
 
-    FLOOR_Y: GAME_HEIGHT * 0.5,
-    FLOOR_HEIGHT: GAME_HEIGHT * 0.2,
+    LEFT_UI_BAR_WIDTH: GAME_WIDTH * 0.12,
 
     ITEMS: {
         WOODEN_SWORD: {
@@ -86,35 +85,17 @@ export default {
     LEVELS: [
         {
             type: LEVEL_TYPES.NORMAL,
-            length: 1, // Whatever 1 default length is
-            enemySpawns: [
-                {
-                    type: "NORMAL",
-                    // or maybe location: {x: 0, y: 0}
-                    quantity: 15,
-                    healthMultiplier: 1,
-                    //spawnMethod: SPAWN_METHODS.RANDOM
-                }
+            enemies: [
+                { type: "NORMAL" },
+                { type: "NORMAL" },
+                { type: "NORMAL" },
             ]
         },
         {
             type: LEVEL_TYPES.NORMAL,
-            length: 1.2,
-            enemySpawns: [
-                {
-                    type: "NORMAL",
-                    // or maybe location: {x: 0, y: 0}
-                    quantity: 30,
-                    healthMultiplier: 1,
-                    //spawnMethod: SPAWN_METHODS.RANDOM
-                },
-                {
-                    type: "STRONGER",
-                    // or maybe location: {x: 0, y: 0}
-                    quantity: 3,
-                    healthMultiplier: 1,
-                    //spawnMethod: SPAWN_METHODS.RANDOM
-                }
+            enemies: [
+                { type: "NORMAL" },
+                { type: "STRONGER" }
             ]
         }
     ],

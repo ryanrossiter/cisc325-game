@@ -1,7 +1,6 @@
 const State = {
 	coins: 0,
-    inCombat: false,
-    combatTurn: -1,
+    level: 0,
 
 	reset: function() {
 		this.coins = 0;

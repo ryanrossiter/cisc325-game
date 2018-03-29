@@ -22,7 +22,7 @@ export default {
     SCALE_RATIO: window.devicePixelRatio / MSR, // 3.5 is the max scale ratio
     PIXEL_SIZE: 1, // Defines the size of pixels used to generate PIXEL_SPRITES
 
-    INITIAL_STATE: 'Main',
+    INITIAL_STATE: 'Title',
 
     LEFT_UI_BAR_WIDTH: GAME_WIDTH * 0.12,
 

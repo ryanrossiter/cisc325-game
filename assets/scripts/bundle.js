@@ -78,8 +78,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__preload__ = __webpack_require__(15);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__main__ = __webpack_require__(16);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__defs__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__menus_main_menu__ = __webpack_require__(20);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__menus_gear_select__ = __webpack_require__(22);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__menus_main_menu__ = __webpack_require__(19);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__menus_gear_select__ = __webpack_require__(21);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__menus_journey_select__ = __webpack_require__(25);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__menus_title__ = __webpack_require__(26);
 
@@ -146,8 +146,7 @@ const ITEM_TYPES = {
 
     INITIAL_STATE: 'Title',
 
-    FLOOR_Y: GAME_HEIGHT * 0.5,
-    FLOOR_HEIGHT: GAME_HEIGHT * 0.2,
+    LEFT_UI_BAR_WIDTH: GAME_WIDTH * 0.12,
 
     ITEMS: {
         WOODEN_SWORD: {
@@ -170,6 +169,16 @@ const ITEM_TYPES = {
             sprite: 'item',
             damage: 50,
             cost: 500,
+            mpCost: 10,
+        }
+    },
+
+    SKILLS: {
+        HEAL_BUFF: {
+            name: "Heal Buff",
+            desc: "Gain HP",
+            sprite: 'item',
+            cost: 5,
             mpCost: 10,
         }
     },
@@ -198,35 +207,17 @@ const ITEM_TYPES = {
     LEVELS: [
         {
             type: LEVEL_TYPES.NORMAL,
-            length: 1, // Whatever 1 default length is
-            enemySpawns: [
-                {
-                    type: "NORMAL",
-                    // or maybe location: {x: 0, y: 0}
-                    quantity: 15,
-                    healthMultiplier: 1,
-                    //spawnMethod: SPAWN_METHODS.RANDOM
-                }
+            enemies: [
+                { type: "NORMAL" },
+                { type: "NORMAL" },
+                { type: "NORMAL" },
             ]
         },
         {
             type: LEVEL_TYPES.NORMAL,
-            length: 1.2,
-            enemySpawns: [
-                {
-                    type: "NORMAL",
-                    // or maybe location: {x: 0, y: 0}
-                    quantity: 30,
-                    healthMultiplier: 1,
-                    //spawnMethod: SPAWN_METHODS.RANDOM
-                },
-                {
-                    type: "STRONGER",
-                    // or maybe location: {x: 0, y: 0}
-                    quantity: 3,
-                    healthMultiplier: 1,
-                    //spawnMethod: SPAWN_METHODS.RANDOM
-                }
+            enemies: [
+                { type: "NORMAL" },
+                { type: "STRONGER" }
             ]
         }
     ],
@@ -256,8 +247,7 @@ const ITEM_TYPES = {
 "use strict";
 const State = {
 	coins: 0,
-    inCombat: false,
-    combatTurn: -1,
+    level: 0,
 
 	reset: function() {
 		this.coins = 0;
@@ -374,23 +364,84 @@ module.exports = g;
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__defs__ = __webpack_require__(1);
 
 
-const HEALTH_BAR_WIDTH = 70;
+
+const DESELECTED_BG_ALPHA = 0.05;
+const SELECTED_BG_ALPHA = 0.2;
+const WIDTH = __WEBPACK_IMPORTED_MODULE_1__defs__["a" /* default */].GAME_WIDTH * 0.9;
+const HEIGHT = 200;
+
+class InfoRow {
+    constructor(parentGroup, innerGroup, x, y) {
+        this.selected = false;
+
+        this.group = parentGroup.add(new Phaser.Group(__WEBPACK_IMPORTED_MODULE_0__game__["default"], null));
+        this.group.x = x;
+        this.group.y = y;
+        this.innerGroup = innerGroup;
+        this.innerGroup.x = -WIDTH / 2;
+
+        this.background = this.group.add(new Phaser.Sprite(__WEBPACK_IMPORTED_MODULE_0__game__["default"], this.innerGroup.x, 0, 'blank'));
+        this.background.width = WIDTH;
+        this.background.height = HEIGHT;
+        this.background.tint = 0x000000;
+        this.background.alpha = 0.05;
+
+        let borderBottom = this.group.add(new Phaser.Sprite(__WEBPACK_IMPORTED_MODULE_0__game__["default"], this.innerGroup.x, HEIGHT, 'blank'));
+        borderBottom.width = WIDTH;
+        borderBottom.height = __WEBPACK_IMPORTED_MODULE_1__defs__["a" /* default */].MSR;
+        borderBottom.tint = 0x777777
+
+        this.group.add(this.innerGroup);
+    }
+
+    setSelected(s) {
+        this.selected = s;
+        this.background.alpha = (this.selected? SELECTED_BG_ALPHA : DESELECTED_BG_ALPHA);
+    }
+
+    onInputUp() {
+        this.setSelected(!this.selected);
+    }
+}
+
+InfoRow.WIDTH = WIDTH;
+InfoRow.HEIGHT = HEIGHT;
+
+/* harmony default export */ __webpack_exports__["a"] = (InfoRow);
+
+
+
+/***/ }),
+/* 6 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__defs__ = __webpack_require__(1);
+
+
+
+const HEALTH_BAR_HEIGHT = __WEBPACK_IMPORTED_MODULE_1__defs__["a" /* default */].GAME_HEIGHT * 0.1;
 
 class Mob {
-    constructor(hp) {
+    constructor(hp, ) {
         this.maxHealth = this.health = hp;
 
         this.healthBar = __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.group(null);
-        this._healthBar = this.healthBar.add(new Phaser.Sprite(__WEBPACK_IMPORTED_MODULE_0__game__["default"], -HEALTH_BAR_WIDTH / 2, 10, 'blank'));
-        this._healthBar.width = HEALTH_BAR_WIDTH;
+        this._healthBar = this.healthBar.add(new Phaser.Sprite(__WEBPACK_IMPORTED_MODULE_0__game__["default"], 0, 0, 'blank'));
+        this._healthBar.height = 1;
+        this._healthBar.width = 40;
         this._healthBar.tint = 0xFF0000;
+        this._healthBar.anchor.set(0.5, 1);
+        this.healthBar.scale.y = HEALTH_BAR_HEIGHT;
     }
 
     hit() {
         this.health--;
-        this._healthBar.width = HEALTH_BAR_WIDTH * Math.max(this.health / this.maxHealth, 0);
+        this._healthBar.scale.y = 0.1 * Math.max(this.health / this.maxHealth, 0);
         this.sprite.tint = 0xFF9090;
         setTimeout(() => { // forgive me pls for using a timeout
             this.sprite.tint = 0xFFFFFF; // reset tint
@@ -421,7 +472,7 @@ class Mob {
 
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -480,59 +531,6 @@ class Button {
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = Button;
 
-
-/***/ }),
-/* 7 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__defs__ = __webpack_require__(1);
-
-
-
-const DESELECTED_BG_ALPHA = 0.05;
-const SELECTED_BG_ALPHA = 0.2;
-const WIDTH = __WEBPACK_IMPORTED_MODULE_1__defs__["a" /* default */].GAME_WIDTH * 0.9;
-const HEIGHT = 200;
-
-class InfoRow {
-    constructor(parentGroup, group, x, y) {
-        this.selected = false;
-
-        this.group = parentGroup.add(new Phaser.Group(__WEBPACK_IMPORTED_MODULE_0__game__["default"], null));
-        this.group.x = x;
-        this.group.y = y;
-        this.innerGroup = group;
-        this.group.add(this.innerGroup);
-        this.innerGroup.x = -WIDTH / 2;
-
-        this.background = this.innerGroup.add(new Phaser.Sprite(__WEBPACK_IMPORTED_MODULE_0__game__["default"], 0, 0, 'blank'));
-        this.background.width = WIDTH;
-        this.background.height = HEIGHT;
-        this.background.tint = 0x000000;
-        this.background.alpha = 0.05;
-
-        let borderBottom = this.innerGroup.add(new Phaser.Sprite(__WEBPACK_IMPORTED_MODULE_0__game__["default"], 0, HEIGHT, 'blank'));
-        borderBottom.width = WIDTH;
-        borderBottom.height = __WEBPACK_IMPORTED_MODULE_1__defs__["a" /* default */].MSR;
-        borderBottom.tint = 0x777777
-    }
-
-    setSelected(s) {
-        this.selected = s;
-        this.background.alpha = (this.selected? SELECTED_BG_ALPHA : DESELECTED_BG_ALPHA);
-    }
-
-    onInputUp() {
-        this.setSelected(!this.selected);
-    }
-}
-
-InfoRow.WIDTH = WIDTH;
-InfoRow.HEIGHT = HEIGHT;
-
-/* harmony default export */ __webpack_exports__["a"] = (InfoRow);
 
 /***/ }),
 /* 8 */
@@ -108727,9 +108725,8 @@ let loadPromises = [];
     
     preload: () => {
         // TODO: replace dummy sprites with actual sprites
-        __WEBPACK_IMPORTED_MODULE_2__utils__["a" /* default */].CreateDummySprite('player', 150, 230, "#99CF9A");
-        __WEBPACK_IMPORTED_MODULE_2__utils__["a" /* default */].CreateDummySprite('enemy', 120, 100, "#D5999A");
-        __WEBPACK_IMPORTED_MODULE_2__utils__["a" /* default */].CreateDummySprite('floor', 10, 10, "#604744");
+        __WEBPACK_IMPORTED_MODULE_2__utils__["a" /* default */].CreateDummySprite('player', 350, 1000, "#99CF9A");
+        __WEBPACK_IMPORTED_MODULE_2__utils__["a" /* default */].CreateDummySprite('enemy', 250, 240, "#D5999A");
         __WEBPACK_IMPORTED_MODULE_2__utils__["a" /* default */].CreateDummySprite('item', 140, 140, "#44764A");
 
         __WEBPACK_IMPORTED_MODULE_2__utils__["a" /* default */].CreateDummySprite('blank', 10, 10, "#FFFFFF");
@@ -108784,7 +108781,6 @@ let loadPromises = [];
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__utils__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__player__ = __webpack_require__(17);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__enemy__ = __webpack_require__(18);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__lootnavigator__ = __webpack_require__(19);
 
 
 
@@ -108792,122 +108788,90 @@ let loadPromises = [];
 
 
 
-
-const ENEMY_COMBAT_POSITIONS = 3; // number of enemies that can be fought at once
-const COMBAT_ENTRY_RANGE = __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH * 0.4;
 const COMBAT_START_DELAY = 500;
 
-let floorTileSprite;
+const uiBarTextStyle = {
+    "font": "Verdana",
+    fill: "#111",
+    fontSize: "70px",
+    align: "center"
+};
+
+let combatTurn;
 let player;
 let enemies;
-let enemiesInCombat;
 let combatDelayTimer;
-let combatKeys;
-let combatKeyTexts;
+let uiBarGroup;
 
 /* harmony default export */ __webpack_exports__["a"] = ({
     create: () => {
-        __WEBPACK_IMPORTED_MODULE_1__state__["a" /* default */].reset();
-        
+        combatTurn = -1;
+        combatDelayTimer = COMBAT_START_DELAY;
+
         __WEBPACK_IMPORTED_MODULE_0__game__["default"].stage.backgroundColor = "#908077";
         __WEBPACK_IMPORTED_MODULE_0__game__["default"].world.setBounds(0, 0, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH * 100, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT);
-        floorTileSprite = __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.tileSprite(-50, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].FLOOR_Y, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH + 100, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].FLOOR_HEIGHT, 'floor');
 
         //game.add.sprite(0, 0, 'test');
 
-        combatKeys = [
-            __WEBPACK_IMPORTED_MODULE_0__game__["default"].input.keyboard.addKey(Phaser.KeyCode.ONE),
-            __WEBPACK_IMPORTED_MODULE_0__game__["default"].input.keyboard.addKey(Phaser.KeyCode.TWO),
-            __WEBPACK_IMPORTED_MODULE_0__game__["default"].input.keyboard.addKey(Phaser.KeyCode.THREE),
-            __WEBPACK_IMPORTED_MODULE_0__game__["default"].input.keyboard.addKey(Phaser.KeyCode.FOUR),
-            __WEBPACK_IMPORTED_MODULE_0__game__["default"].input.keyboard.addKey(Phaser.KeyCode.FIVE),
-        ];
-
-        player = new __WEBPACK_IMPORTED_MODULE_4__player__["a" /* default */](100, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT * 0.7);
+        player = new __WEBPACK_IMPORTED_MODULE_4__player__["a" /* default */](__WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH * 0.3, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT);
         enemies = [];
-        enemiesInCombat = new Array(ENEMY_COMBAT_POSITIONS);
 
-        enemies.push(new __WEBPACK_IMPORTED_MODULE_5__enemy__["a" /* default */](__WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH - 500, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT * 0.7, "NORMAL"));
-        enemies.push(new __WEBPACK_IMPORTED_MODULE_5__enemy__["a" /* default */](__WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH - 600, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT * 0.7 + 50, "NORMAL"));
-        enemies.push(new __WEBPACK_IMPORTED_MODULE_5__enemy__["a" /* default */](__WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH - 550, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT * 0.7 - 100, "NORMAL"));
-
-        // add after enemies to keep on top, alternatively create a UI group that appears over top
-        combatKeyTexts = [];
-        for (var i = 0; i < ENEMY_COMBAT_POSITIONS; i++) {
-            var t = __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.text(0, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].FLOOR_Y + (i + 0.5) / ENEMY_COMBAT_POSITIONS * __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].FLOOR_HEIGHT - 100, i + 1);
-            t.visible = false;
-            combatKeyTexts[i] = t;
+        let level = __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].LEVELS[__WEBPACK_IMPORTED_MODULE_1__state__["a" /* default */].level];
+        let xd = (__WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH - __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].LEFT_UI_BAR_WIDTH) / level.enemies.length;
+        let yd = __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT * 0.1 / level.enemies.length;
+        for (var i = 0; i < level.enemies.length; i++) {
+            enemies.push(new __WEBPACK_IMPORTED_MODULE_5__enemy__["a" /* default */](__WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].LEFT_UI_BAR_WIDTH + xd * (i + 0.5), __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT * 0.3 + yd * Math.pow(i, 1.8), level.enemies[i].type));
         }
 
-        new __WEBPACK_IMPORTED_MODULE_6__lootnavigator__["a" /* default */](__WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH / 2, 110);
+        uiBarGroup = __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.group();
+        var uiBarBg = uiBarGroup.add(new Phaser.Sprite(__WEBPACK_IMPORTED_MODULE_0__game__["default"], 0, 0, 'blank'));
+        uiBarBg.height = __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT;
+        uiBarBg.width = __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].LEFT_UI_BAR_WIDTH;
+        uiBarBg.tint = 0x999999;
+
+        uiBarGroup.add(player.healthBar);
+        player.healthBar.x = __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].LEFT_UI_BAR_WIDTH / 2;
+        player.healthBar.y = __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT * 0.97;
+
+        uiBarGroup.add(new Phaser.Text(__WEBPACK_IMPORTED_MODULE_0__game__["default"],
+            __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].LEFT_UI_BAR_WIDTH / 2,
+            __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT * 0.53,
+            "LV\n" + (__WEBPACK_IMPORTED_MODULE_1__state__["a" /* default */].level + 1),
+            uiBarTextStyle,
+        )).anchor.set(0.5, 0.5);
+
+        for (var i = 0; i < enemies.length; i++) {
+            let enemy = enemies[i];
+            uiBarGroup.add(new Phaser.Text(__WEBPACK_IMPORTED_MODULE_0__game__["default"],
+                __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].LEFT_UI_BAR_WIDTH / 2,
+                __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT * 0.16 * i + __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT * 0.03,
+                "M" + (i+1),
+                uiBarTextStyle,
+            )).anchor.set(0.5, 0.5);
+            uiBarGroup.add(enemy.healthBar);
+            enemy.healthBar.x = __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].LEFT_UI_BAR_WIDTH / 2;
+            enemy.healthBar.y = __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT * 0.16 * (i + 1);
+
+            let line = uiBarGroup.add(new Phaser.Sprite(__WEBPACK_IMPORTED_MODULE_0__game__["default"], 0, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT * 0.16 * (i + 1) + 23, 'blank'));
+            line.width = __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].LEFT_UI_BAR_WIDTH;
+            line.height = 2 * __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].MSR;
+            line.tint = 0x555555;
+        }
     },
 
     update: () => {
-        player.update();
-
-        floorTileSprite.x = __WEBPACK_IMPORTED_MODULE_0__game__["default"].camera.x - 50;
-        floorTileSprite.tilePosition.x = -(__WEBPACK_IMPORTED_MODULE_0__game__["default"].camera.x - 50);
-
-        let enteringCombat = __WEBPACK_IMPORTED_MODULE_1__state__["a" /* default */].inCombat;
-        for (var i = 0; i < enemies.length; i++) {
-            enemies[i].update();
-
-            if (!enteringCombat && Math.abs(enemies[i].sprite.x - player.sprite.x) <= COMBAT_ENTRY_RANGE) {
-                enteringCombat = true;
-            }
-        }
-
-        if (enteringCombat && !__WEBPACK_IMPORTED_MODULE_1__state__["a" /* default */].inCombat) {
-            __WEBPACK_IMPORTED_MODULE_1__state__["a" /* default */].inCombat = true;
-            __WEBPACK_IMPORTED_MODULE_1__state__["a" /* default */].combatTurn = -1; // player's turn
-            combatDelayTimer = COMBAT_START_DELAY;
-            __WEBPACK_IMPORTED_MODULE_0__game__["default"].camera.unfollow();
-
-            // move player to center y
-            __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.tween(player.sprite).to({
-                y: __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].FLOOR_Y + __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].FLOOR_HEIGHT / 2 + player.sprite.height * 0.4
-            }, COMBAT_START_DELAY).start();
-
-            // move all on screen enemies into combat positions
-            for (var i = 0; i < enemies.length; i++) {
-                if (enemies[i].sprite.inCamera) {
-                    let combatPos = -1;
-                    for (var p = 0; p < ENEMY_COMBAT_POSITIONS; p++) {
-                        if (!enemiesInCombat[p]) {
-                            combatPos = p;
-                            enemiesInCombat[p] = enemies[i];
-                            combatKeyTexts[p].position.x = player.sprite.x + COMBAT_ENTRY_RANGE - 50 + p % 2 * 120;
-                            combatKeyTexts[p].visible = true;
-                            break;
-                        }
-                    }
-
-                    if (combatPos === -1) {
-                        // couldn't find an available combat position so move the sprite offscreen
-                        __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.tween(enemies[i].sprite).to({
-                            x: __WEBPACK_IMPORTED_MODULE_0__game__["default"].camera.x + __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH + 200
-                        }, COMBAT_START_DELAY).start();
-                    } else {
-                        // move the sprite into it's combat position
-                        __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.tween(enemies[i].sprite).to({
-                            x: player.sprite.x + COMBAT_ENTRY_RANGE - 50 + combatPos % 2 * 120,
-                            y: __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].FLOOR_Y + (combatPos + 0.5) / ENEMY_COMBAT_POSITIONS * __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].FLOOR_HEIGHT
-                        }, COMBAT_START_DELAY).start();
-                    }
-                }
-            }
-        } else if (__WEBPACK_IMPORTED_MODULE_1__state__["a" /* default */].inCombat && combatDelayTimer <= 0) {
+        if (combatDelayTimer <= 0) {
             let usedTurn = false;
-            if (__WEBPACK_IMPORTED_MODULE_1__state__["a" /* default */].combatTurn === -1) {
+            if (combatTurn === -1) {
                 // player's turn
                 let targetEnemy, targetEnemyPos;
                 let combatOver = true;
-                for (var p = 0; p < ENEMY_COMBAT_POSITIONS; p++) {
-                    if (enemiesInCombat[p]) {
+                for (var p = 0; p < enemies.length; p++) {
+                    if (enemies[p]) {
                         combatOver = false;
-                        if (combatKeys[p].isDown) {
+                        if (enemies[p].sprite.input.justPressed()) {
                             targetEnemyPos = p;
-                            targetEnemy = enemiesInCombat[p];
+                            targetEnemy = enemies[p];
                             break;
                         }
                     }
@@ -108920,22 +108884,19 @@ let combatKeyTexts;
                     player.attack(targetEnemy, () => {
                         if (targetEnemy.health <= 0) {
                             // KILL IT
-                            delete enemiesInCombat[enemiesInCombat.indexOf(targetEnemy)];
-                            enemies.splice(enemies.indexOf(targetEnemy), 1);
+                            delete enemies[targetEnemyPos];
+                            enemies.splice(targetEnemyPos, 1);
                             targetEnemy.sprite.destroy();
-
-                            // hide combat key text
-                            combatKeyTexts[targetEnemyPos].visible = false;
                         }
                     });
                 } else if (combatOver) {
-                    __WEBPACK_IMPORTED_MODULE_0__game__["default"].camera.follow(player.sprite, Phaser.Camera.FOLLOW_PLATFORMER);
-                    __WEBPACK_IMPORTED_MODULE_1__state__["a" /* default */].inCombat = false;
+                    __WEBPACK_IMPORTED_MODULE_1__state__["a" /* default */].level++;
+                    __WEBPACK_IMPORTED_MODULE_0__game__["default"].state.restart(); // restart state with new level
                 }
             } else {
                 // enemy's turn
                 usedTurn = true;
-                let enemy = enemiesInCombat[__WEBPACK_IMPORTED_MODULE_1__state__["a" /* default */].combatTurn];
+                let enemy = enemies[combatTurn];
                 if (enemy) {
                     combatDelayTimer = 1000; // delay next attack until animations are done
                     enemy.attack(player, () => {
@@ -108947,18 +108908,13 @@ let combatKeyTexts;
             }
 
             if (usedTurn) {
-                __WEBPACK_IMPORTED_MODULE_1__state__["a" /* default */].combatTurn++;
-                if (__WEBPACK_IMPORTED_MODULE_1__state__["a" /* default */].combatTurn == ENEMY_COMBAT_POSITIONS) __WEBPACK_IMPORTED_MODULE_1__state__["a" /* default */].combatTurn = -1; // reset to player's turn
+                combatTurn++;
+                if (combatTurn == enemies.length) combatTurn = -1; // reset to player's turn
             }
         } else if (combatDelayTimer > 0) {
             combatDelayTimer -= __WEBPACK_IMPORTED_MODULE_0__game__["default"].time.elapsed;
         }
     },
-
-    render: () => {
-        __WEBPACK_IMPORTED_MODULE_0__game__["default"].debug.text( "InCombat: " + __WEBPACK_IMPORTED_MODULE_1__state__["a" /* default */].inCombat, 100, 100 );
-        __WEBPACK_IMPORTED_MODULE_0__game__["default"].debug.text( "Combat Turn: " + __WEBPACK_IMPORTED_MODULE_1__state__["a" /* default */].combatTurn, 100, 120 );
-    }
 });
 
 /***/ }),
@@ -108969,52 +108925,22 @@ let combatKeyTexts;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__state__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__defs__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__mob__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__mob__ = __webpack_require__(6);
 
 
 
 
 
-const YSPEED = 1.5;
-const XSPEED = 3;
+const HEALTH_BAR_HEIGHT = __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT * 0.4;
 
 class Player extends __WEBPACK_IMPORTED_MODULE_3__mob__["a" /* default */] {
     constructor(x, y) {
-        super(10);
+        super(200);
 
         this.sprite = __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.sprite(x, y, 'player');
         this.sprite.anchor.set(0.5, 1); // set sprite anchor at feet
-        __WEBPACK_IMPORTED_MODULE_0__game__["default"].camera.follow(this.sprite, Phaser.Camera.FOLLOW_PLATFORMER);
-
-        this.sprite.addChild(this.healthBar);
-
-        this.keys = __WEBPACK_IMPORTED_MODULE_0__game__["default"].input.keyboard.createCursorKeys();
-    }
-
-    update() {
-        if (!__WEBPACK_IMPORTED_MODULE_1__state__["a" /* default */].inCombat) {
-            if (this.keys.up.isDown) {
-                this.sprite.y -= YSPEED;
-                if (this.sprite.y < __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].FLOOR_Y) {
-                    this.sprite.y = __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].FLOOR_Y;
-                }
-            }
-
-            if (this.keys.down.isDown) {
-                this.sprite.y += YSPEED;
-                if (this.sprite.y > __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].FLOOR_Y + __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].FLOOR_HEIGHT) {
-                    this.sprite.y = __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].FLOOR_Y + __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].FLOOR_HEIGHT;
-                }
-            }
-
-            if (this.keys.left.isDown) {
-                this.sprite.x -= XSPEED;
-            }
-
-            if (this.keys.right.isDown) {
-                this.sprite.x += XSPEED;
-            }
-        }
+        this.healthBar.scale.y = HEALTH_BAR_HEIGHT;
+        //this.sprite.addChild(this.healthBar);
     }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = Player;
@@ -109028,15 +108954,11 @@ class Player extends __WEBPACK_IMPORTED_MODULE_3__mob__["a" /* default */] {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__state__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__defs__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__mob__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__mob__ = __webpack_require__(6);
 
 
 
 
-
-const YSPEED = 1;
-const XSPEED = 2;
-const DIR_CHANGE_DELAY = 500;
 
 class Enemy extends __WEBPACK_IMPORTED_MODULE_3__mob__["a" /* default */] {
     constructor(x, y, type) {
@@ -109045,38 +108967,9 @@ class Enemy extends __WEBPACK_IMPORTED_MODULE_3__mob__["a" /* default */] {
 
         this.sprite = __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.sprite(x, y, DATA.sprite);
         this.sprite.anchor.set(0.5, 1);
+        this.sprite.inputEnabled = true;
 
-        this.sprite.addChild(this.healthBar);
-
-        this.dir = 4;
-        this.changeDirectionTimer = 0;
-    }
-
-    update() {
-        if (!__WEBPACK_IMPORTED_MODULE_1__state__["a" /* default */].inCombat) {
-            if (this.changeDirectionTimer <= 0) {
-                this.changeDirectionTimer = DIR_CHANGE_DELAY * (1 + (Math.random() - 0.5) * 0.4);
-                this.dir = ~~(Math.random() * 10);
-            } else {
-                this.changeDirectionTimer -= __WEBPACK_IMPORTED_MODULE_0__game__["default"].time.elapsed;
-            }
-
-            if (this.dir == 0) {
-                this.sprite.x -= XSPEED;
-            } else if (this.dir == 1) {
-                this.sprite.x += XSPEED;
-            } else if (this.dir == 2) {
-                this.sprite.y += YSPEED;
-                if (this.sprite.y > __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].FLOOR_Y + __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].FLOOR_HEIGHT) {
-                    this.sprite.y = __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].FLOOR_Y + __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].FLOOR_HEIGHT;
-                }
-            } else if (this.dir == 3) {
-                this.sprite.y -= YSPEED;
-                if (this.sprite.y < __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].FLOOR_Y) {
-                    this.sprite.y = __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].FLOOR_Y;
-                }
-            }
-        }
+        //this.sprite.addChild(this.healthBar);
     }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = Enemy;
@@ -109091,112 +108984,7 @@ class Enemy extends __WEBPACK_IMPORTED_MODULE_3__mob__["a" /* default */] {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__state__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__defs__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__utils__ = __webpack_require__(3);
-
-
-
-
-
-const TITLE_HEIGHT = 90;
-const HEIGHT = 350;
-const WIDTH = 550;
-
-class LootSelector {
-    constructor(lootNavigator) {
-        this.lootNavigator = lootNavigator;
-        var dialogBmd = __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.bitmapData(1000, 800, null, false);
-        dialogBmd.ctx.fillStyle = "#EEF";
-        dialogBmd.ctx.strokeStyle = "#222";
-        dialogBmd.ctx.lineWidth = 14;
-        __WEBPACK_IMPORTED_MODULE_3__utils__["a" /* default */].DrawRoundedRect(dialogBmd.ctx, 0, 0, 1000, 800, 20);
-        this.dialog = __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.sprite(__WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH / 2 - 500, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT / 2 - 400, dialogBmd);
-        this.dialog.visible = false;
-
-        let xi = 0, yi = 0;
-        for (var itemKey in __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].ITEMS) {
-            let item = __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].ITEMS[itemKey];
-            let itemSprite = this.dialog.addChild(new Phaser.Sprite(__WEBPACK_IMPORTED_MODULE_0__game__["default"], xi * 180 + 50, yi * 180 + 50, item.sprite));
-            itemSprite.inputEnabled = true;
-            itemSprite.events.onInputDown.add(() => this.onItemClicked(itemKey));
-            xi++;
-        }
-    }
-
-    onItemClicked(itemKey) {
-        this.dialog.visible = false;
-        this.lootNavigator.setSelectedItem(itemKey);
-    }
-
-    show() {
-        this.dialog.visible = true;
-    }
-}
-
-class LootNavigator {
-    constructor(x, y) {
-        var dialogBmd = __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.bitmapData(WIDTH, HEIGHT, null, false);
-        dialogBmd.ctx.fillStyle = "#666";
-        dialogBmd.ctx.strokeStyle = "#333";
-        dialogBmd.ctx.lineWidth = 14;
-        __WEBPACK_IMPORTED_MODULE_3__utils__["a" /* default */].DrawRoundedRect(dialogBmd.ctx, 0, 0, WIDTH, HEIGHT, 20, true, false); // fill
-        dialogBmd.ctx.fillStyle = "#777";
-        dialogBmd.ctx.clip();
-        dialogBmd.ctx.fillRect(0, TITLE_HEIGHT, 200, 260);
-        dialogBmd.ctx.fillRect(220, TITLE_HEIGHT, 330, 260);
-        __WEBPACK_IMPORTED_MODULE_3__utils__["a" /* default */].DrawRoundedRect(dialogBmd.ctx, 0, 0, WIDTH, HEIGHT, 20, false, true); // stroke
-        this.dialog = __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.sprite(x, y, dialogBmd);
-
-        this.dialog.addChild(new Phaser.Text(__WEBPACK_IMPORTED_MODULE_0__game__["default"], 0, 0, "Item Progress", {
-            "font": "Verdana",
-            fill: "#FFF",
-            fontSize: "44px",
-            boundsAlignH: "center",
-            boundsAlignV: "middle"
-        })).setTextBounds(0, 2, WIDTH, TITLE_HEIGHT);
-
-        this.clickToSelectText = this.dialog.addChild(new Phaser.Text(__WEBPACK_IMPORTED_MODULE_0__game__["default"], 0, 0, "Click to\nSelect", {
-            "font": "Verdana",
-            fill: "#FFF",
-            fontSize: "34px",
-            align: "center",
-            boundsAlignH: "center",
-            boundsAlignV: "middle"
-        })).setTextBounds(0, TITLE_HEIGHT, 200, 260);
-
-        this.itemSprite = this.dialog.addChild(new Phaser.Sprite(__WEBPACK_IMPORTED_MODULE_0__game__["default"], 100, 220));
-        this.itemSprite.anchor.set(0.5);
-
-        this.clickArea = this.dialog.addChild(new Phaser.Sprite(__WEBPACK_IMPORTED_MODULE_0__game__["default"], 0, TITLE_HEIGHT, 'blank'));
-        this.clickArea.width = 180;
-        this.clickArea.height = 200;
-        this.clickArea.alpha = 0;
-        this.clickArea.inputEnabled = true;
-        this.clickArea.events.onInputDown.add(this.onClick, this);
-
-        this.lootSelector = new LootSelector(this);
-    }
-
-    setSelectedItem(itemKey) {
-        this.itemSprite.loadTexture(__WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].ITEMS[itemKey].sprite);
-        this.clickToSelectText.visible = false;
-    }
-
-    onClick() {
-        this.lootSelector.show();
-    }
-}
-/* harmony export (immutable) */ __webpack_exports__["a"] = LootNavigator;
-
-
-/***/ }),
-/* 20 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__state__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__defs__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__utils__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__components_NameDialog__ = __webpack_require__(21);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__components_NameDialog__ = __webpack_require__(20);
 
 
 
@@ -109272,7 +109060,7 @@ const outlineTextStyle = {
 });
 
 /***/ }),
-/* 21 */
+/* 20 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -109355,7 +109143,7 @@ class NameDialog {
 
 
 /***/ }),
-/* 22 */
+/* 21 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -109363,10 +109151,12 @@ class NameDialog {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__state__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__defs__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__utils__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__components_Button__ = __webpack_require__(6);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__components_GroupSwipe__ = __webpack_require__(23);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__components_InfoRow__ = __webpack_require__(7);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__components_ItemInfo__ = __webpack_require__(24);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__components_Button__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__components_GroupSwipe__ = __webpack_require__(22);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__components_InfoRow__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__components_ItemInfo__ = __webpack_require__(23);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__components_SkillInfo__ = __webpack_require__(24);
+
 
 
 
@@ -109415,11 +109205,14 @@ const SCROLL_BOX_WIDTH = __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].
 const SCROLL_BOX_HEIGHT = __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT * 0.275;
 
 const STARTING_MONEY = 1000;
+const STARTING_SP = 60;
 
 let equipmentGroupSwipe;
 let skillsGroupSwipe;
 let moneyText;
+let spText;
 let remainingMoney;
+let remainingSp;
 
 /* harmony default export */ __webpack_exports__["a"] = ({
     init: () => {
@@ -109432,6 +109225,7 @@ let remainingMoney;
 
     create: () => {
         remainingMoney = STARTING_MONEY;
+        remainingSp = STARTING_SP;
 
         __WEBPACK_IMPORTED_MODULE_0__game__["default"].stage.backgroundColor = "#F5F5F5";
         __WEBPACK_IMPORTED_MODULE_0__game__["default"].world.setBounds(0, 0, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH * 100, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT);
@@ -109489,7 +109283,9 @@ let remainingMoney;
 
         // create skill selector
         __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.text(30, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT * 0.5, "SKILLS", outlineTextStyle);
-        let skillOptions = [];
+        spText = __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.text(__WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH * 0.9, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT * 0.5, remainingSp + "sp", labelTextStyle);
+        spText.anchor.set(1, 0);
+        let skillOptions = Object.values(__WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].SKILLS);
         let skillsGroup = __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.group();
         skillsGroup.x = __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH / 2;
         skillsGroup.y = __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT * 0.575;
@@ -109498,13 +109294,28 @@ let remainingMoney;
 
         let skillRows = [];
         for (var i = 0; i < skillOptions.length; i++) {
-            skillRows.push(new __WEBPACK_IMPORTED_MODULE_6__components_InfoRow__["a" /* default */](skillsScrollGroup, 0, i * __WEBPACK_IMPORTED_MODULE_6__components_InfoRow__["a" /* default */].HEIGHT));
+            var skillInfo = new __WEBPACK_IMPORTED_MODULE_8__components_SkillInfo__["a" /* default */](skillOptions[i]);
+            skillRows.push(new __WEBPACK_IMPORTED_MODULE_6__components_InfoRow__["a" /* default */](skillsScrollGroup, skillInfo.group, 0, i * __WEBPACK_IMPORTED_MODULE_6__components_InfoRow__["a" /* default */].HEIGHT));
         }
 
         skillsGroupSwipe = new __WEBPACK_IMPORTED_MODULE_5__components_GroupSwipe__["a" /* default */](skillsGroup, skillsScrollGroup, SCROLL_BOX_WIDTH, SCROLL_BOX_HEIGHT, false, true,
             __WEBPACK_IMPORTED_MODULE_6__components_InfoRow__["a" /* default */].HEIGHT, skillOptions.length, (dist, incrementPressed) => {
                 if (dist === 0 && incrementPressed < skillRows.length) {
-                    skillRows[incrementPressed].onInputUp();
+                    let allowToggle = true;
+                    if (!skillRows[incrementPressed].selected && remainingSp < skillOptions[incrementPressed].cost) {
+                        allowToggle = false;
+                    }
+
+                    if (allowToggle) {
+                        skillRows[incrementPressed].onInputUp();
+                        if (skillRows[incrementPressed].selected) {
+                            remainingSp -= skillOptions[incrementPressed].cost;
+                        } else {
+                            remainingSp += skillOptions[incrementPressed].cost;
+                        }
+
+                        spText.text = remainingSp + "sp";
+                    }
                 }
             }
         );
@@ -109518,7 +109329,7 @@ let remainingMoney;
 });
 
 /***/ }),
-/* 23 */
+/* 22 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -109618,13 +109429,13 @@ class GroupSwipe {
 
 
 /***/ }),
-/* 24 */
+/* 23 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__defs__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__InfoRow__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__InfoRow__ = __webpack_require__(5);
 
 
 
@@ -109660,6 +109471,48 @@ class ItemInfo {
 
 
 /***/ }),
+/* 24 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__defs__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__InfoRow__ = __webpack_require__(5);
+
+
+
+
+const skillNameTextStyle = {
+    "font": "Verdana",
+    fill: "#111",
+    fontSize: "70px",
+    boundsAlignV: 'middle',
+    wordWrap: true,
+    wordWrapWidth: __WEBPACK_IMPORTED_MODULE_2__InfoRow__["a" /* default */].WIDTH * 0.6
+};
+
+const costTextStyle = {
+    "font": "Verdana",
+    fill: "#0A0A0A",
+    fontSize: "65px",
+    fontWeight: "bold"
+};
+
+class SkillInfo {
+    constructor(skill) {
+        this.skill = skill;
+        this.group = new Phaser.Group(__WEBPACK_IMPORTED_MODULE_0__game__["default"], null);
+
+        this.group.addChild(new Phaser.Sprite(__WEBPACK_IMPORTED_MODULE_0__game__["default"], __WEBPACK_IMPORTED_MODULE_2__InfoRow__["a" /* default */].HEIGHT / 2, __WEBPACK_IMPORTED_MODULE_2__InfoRow__["a" /* default */].HEIGHT / 2, skill.sprite)).anchor.set(0.5);
+        this.group.addChild(new Phaser.Text(__WEBPACK_IMPORTED_MODULE_0__game__["default"], 0, 0, skill.name, skillNameTextStyle))
+            .setTextBounds(__WEBPACK_IMPORTED_MODULE_2__InfoRow__["a" /* default */].WIDTH * 0.175, 0, __WEBPACK_IMPORTED_MODULE_2__InfoRow__["a" /* default */].WIDTH * 0.6, __WEBPACK_IMPORTED_MODULE_2__InfoRow__["a" /* default */].HEIGHT);
+        this.group.addChild(new Phaser.Text(__WEBPACK_IMPORTED_MODULE_0__game__["default"], __WEBPACK_IMPORTED_MODULE_2__InfoRow__["a" /* default */].WIDTH * 0.95, __WEBPACK_IMPORTED_MODULE_2__InfoRow__["a" /* default */].HEIGHT / 2, skill.cost + "sp", costTextStyle)).anchor.set(1, 0.5);
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = SkillInfo;
+
+
+/***/ }),
 /* 25 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -109668,7 +109521,7 @@ class ItemInfo {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__state__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__defs__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__utils__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__components_Button__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__components_Button__ = __webpack_require__(7);
 
 
 

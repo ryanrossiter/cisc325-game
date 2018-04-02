@@ -74,20 +74,11 @@ export default {
 
         game.add.text(Defs.GAME_WIDTH / 2, 120, "Gear Up Your Character!", titleTextStyle).anchor.set(0.5);
 
-        var startButton = new Button(Defs.GAME_WIDTH / 2, Defs.GAME_HEIGHT * 0.925, Defs.GAME_WIDTH * 0.925, 270);
-        startButton.onChange = (pressed) => {
-            if (pressed) {
-                game.state.start("Main");
-            }
-        };
-
-        startButton.sprite.addChild(new Phaser.Text(game, 0, 0, "START!!", startTextStyle)).anchor.set(0.5);
-
         // create equipment selector
         game.add.text(30, Defs.GAME_HEIGHT * 0.1, "EQUIPMENT", outlineTextStyle);
         moneyText = game.add.text(Defs.GAME_WIDTH * 0.9, Defs.GAME_HEIGHT * 0.1, remainingMoney + "g", labelTextStyle);
         moneyText.anchor.set(1, 0);
-        let equipmentOptions = Object.values(Defs.ITEMS);
+        let equipmentOptions = Object.values(Defs.ITEMS).filter((i) => i.type !== Defs.ITEM_TYPES.SKILL);
         let equipmentGroup = game.add.group();
         equipmentGroup.x = Defs.GAME_WIDTH / 2;
         equipmentGroup.y = Defs.GAME_HEIGHT * 0.175;
@@ -127,7 +118,7 @@ export default {
         game.add.text(30, Defs.GAME_HEIGHT * 0.5, "SKILLS", outlineTextStyle);
         spText = game.add.text(Defs.GAME_WIDTH * 0.9, Defs.GAME_HEIGHT * 0.5, remainingSp + "sp", labelTextStyle);
         spText.anchor.set(1, 0);
-        let skillOptions = Object.values(Defs.SKILLS);
+        let skillOptions = Object.values(Defs.ITEMS).filter((i) => i.type === Defs.ITEM_TYPES.SKILL);
         let skillsGroup = game.add.group();
         skillsGroup.x = Defs.GAME_WIDTH / 2;
         skillsGroup.y = Defs.GAME_HEIGHT * 0.575;
@@ -162,6 +153,24 @@ export default {
             }
         );
         skillsGroupSwipe.setSwipeBoxAnchor(0.5, 0);
+
+        var startButton = new Button(Defs.GAME_WIDTH / 2, Defs.GAME_HEIGHT * 0.925, Defs.GAME_WIDTH * 0.925, 270);
+        startButton.onChange = (pressed) => {
+            if (pressed) {
+                State.items = [];
+                for (var i = 0; i < equipmentRows.length; i++) {
+                    if (equipmentRows[i].selected) State.items.push(equipmentOptions[i]);
+                }
+
+                State.skills = [];
+                for (var i = 0; i < skillRows.length; i++) {
+                    if (skillRows[i].selected) State.skills.push(skillOptions[i]);
+                }
+                game.state.start("Main");
+            }
+        };
+
+        startButton.sprite.addChild(new Phaser.Text(game, 0, 0, "START!!", startTextStyle)).anchor.set(0.5);
     },
 
     update: () => {

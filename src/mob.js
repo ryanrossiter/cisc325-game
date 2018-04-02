@@ -16,8 +16,8 @@ export default class Mob {
         this.healthBar.scale.y = HEALTH_BAR_HEIGHT;
     }
 
-    hit() {
-        this.health--;
+    hit(dmg=1) {
+        this.health -= dmg;
         this._healthBar.scale.y = 0.1 * Math.max(this.health / this.maxHealth, 0);
         this.sprite.tint = 0xFF9090;
         setTimeout(() => { // forgive me pls for using a timeout
@@ -25,7 +25,7 @@ export default class Mob {
         }, 100);
     }
 
-    attack(mob, onHit) {
+    attack(mob, dmg, onHit) {
         let targetHealth = mob.health;
 
         game.add.tween(this.sprite).to({
@@ -40,7 +40,7 @@ export default class Mob {
             // phaser is being dumb and firing this event multiple times so don't do anything if the target enemy's health has changed
             if (mob.health !== targetHealth) return;
 
-            mob.hit();
+            mob.hit(dmg);
             onHit();
         });
     }

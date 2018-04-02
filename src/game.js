@@ -19,7 +19,6 @@ import JourneySelect from './menus/journey_select';
 import Title from './menus/title';
 
 const game = new Phaser.Game(Defs.GAME_WIDTH, Defs.GAME_HEIGHT, Phaser.AUTO, 'phaser-parent');
-
 game.state.add("Preload", Preload);
 game.state.add("Main", Main);
 game.state.add("Title", Title);

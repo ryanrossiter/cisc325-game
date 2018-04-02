@@ -69,19 +69,19 @@
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_expose_loader_PIXI_phaser_ce_build_custom_pixi_js__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_expose_loader_PIXI_phaser_ce_build_custom_pixi_js__ = __webpack_require__(10);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_expose_loader_PIXI_phaser_ce_build_custom_pixi_js___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_expose_loader_PIXI_phaser_ce_build_custom_pixi_js__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_expose_loader_p2_phaser_ce_build_custom_p2_js__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_expose_loader_p2_phaser_ce_build_custom_p2_js__ = __webpack_require__(12);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_expose_loader_p2_phaser_ce_build_custom_p2_js___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_expose_loader_p2_phaser_ce_build_custom_p2_js__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_expose_loader_Phaser_phaser_ce_build_custom_phaser_split_js__ = __webpack_require__(12);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_expose_loader_Phaser_phaser_ce_build_custom_phaser_split_js__ = __webpack_require__(14);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_expose_loader_Phaser_phaser_ce_build_custom_phaser_split_js___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_expose_loader_Phaser_phaser_ce_build_custom_phaser_split_js__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__preload__ = __webpack_require__(15);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__main__ = __webpack_require__(16);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__preload__ = __webpack_require__(17);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__main__ = __webpack_require__(18);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__defs__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__menus_main_menu__ = __webpack_require__(19);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__menus_gear_select__ = __webpack_require__(21);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__menus_journey_select__ = __webpack_require__(25);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__menus_title__ = __webpack_require__(26);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__menus_main_menu__ = __webpack_require__(24);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__menus_gear_select__ = __webpack_require__(26);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__menus_journey_select__ = __webpack_require__(28);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__menus_title__ = __webpack_require__(29);
 
 /**
  * Import Phaser dependencies using `expose-loader`.
@@ -103,7 +103,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 const game = new __WEBPACK_IMPORTED_MODULE_2_expose_loader_Phaser_phaser_ce_build_custom_phaser_split_js___default.a.Game(__WEBPACK_IMPORTED_MODULE_5__defs__["a" /* default */].GAME_WIDTH, __WEBPACK_IMPORTED_MODULE_5__defs__["a" /* default */].GAME_HEIGHT, __WEBPACK_IMPORTED_MODULE_2_expose_loader_Phaser_phaser_ce_build_custom_phaser_split_js___default.a.AUTO, 'phaser-parent');
-
 game.state.add("Preload", __WEBPACK_IMPORTED_MODULE_3__preload__["a" /* default */]);
 game.state.add("Main", __WEBPACK_IMPORTED_MODULE_4__main__["a" /* default */]);
 game.state.add("Title", __WEBPACK_IMPORTED_MODULE_9__menus_title__["a" /* default */]);
@@ -135,6 +134,8 @@ const ITEM_TYPES = {
     RANGED: 1,
     MELEE: 2,
     ABILITY: 3,
+    CONSUMABLE: 4,
+    SKILL: 5,
 };
 
 /* harmony default export */ __webpack_exports__["a"] = ({
@@ -148,7 +149,15 @@ const ITEM_TYPES = {
 
     LEFT_UI_BAR_WIDTH: GAME_WIDTH * 0.12,
 
+    ITEM_TYPES,
     ITEMS: {
+        HEALTH_POTION: {
+            name: "Health Potion",
+            type: ITEM_TYPES.CONSUMABLE,
+            sprite: 'item',
+            cost: 200,
+            hpBuff: 75,
+        },
         WOODEN_SWORD: {
             name: "Wooden Sword",
             type: ITEM_TYPES.MELEE,
@@ -170,12 +179,10 @@ const ITEM_TYPES = {
             damage: 50,
             cost: 500,
             mpCost: 10,
-        }
-    },
-
-    SKILLS: {
+        },
         HEAL_BUFF: {
             name: "Heal Buff",
+            type: ITEM_TYPES.SKILL,
             desc: "Gain HP",
             sprite: 'item',
             cost: 5,
@@ -187,6 +194,7 @@ const ITEM_TYPES = {
         NORMAL: { // maybe add other stats like def?
             sprite: 'enemy',
             health: 90,
+            damage: 10,
             drop_rates: {
                 // key: item key, value: % chance of dropping
                 "STEEL_SWORD": 0.05,
@@ -196,6 +204,7 @@ const ITEM_TYPES = {
         STRONGER: { // maybe add other stats like def?
             sprite: 'enemy',
             health: 150,
+            damage: 25,
             drop_rates: {
                 "STEEL_SWORD": 0.25,
                 "WAND": 0.1,
@@ -248,6 +257,8 @@ const ITEM_TYPES = {
 const State = {
 	coins: 0,
     level: 0,
+    items: [],
+    skills: [],
 
 	reset: function() {
 		this.coins = 0;
@@ -333,33 +344,6 @@ const State = {
 
 /***/ }),
 /* 4 */
-/***/ (function(module, exports) {
-
-var g;
-
-// This works in non-strict mode
-g = (function() {
-	return this;
-})();
-
-try {
-	// This works if eval is allowed (see CSP)
-	g = g || Function("return this")() || (1,eval)("this");
-} catch(e) {
-	// This works if the window reference is available
-	if(typeof window === "object")
-		g = window;
-}
-
-// g can still be undefined, but nothing to do about it...
-// We return undefined, instead of nothing here, so it's
-// easier to handle this case. if(!global) { ...}
-
-module.exports = g;
-
-
-/***/ }),
-/* 5 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -415,64 +399,34 @@ InfoRow.HEIGHT = HEIGHT;
 
 
 /***/ }),
-/* 6 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/* 5 */
+/***/ (function(module, exports) {
 
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__defs__ = __webpack_require__(1);
+var g;
 
+// This works in non-strict mode
+g = (function() {
+	return this;
+})();
 
-
-const HEALTH_BAR_HEIGHT = __WEBPACK_IMPORTED_MODULE_1__defs__["a" /* default */].GAME_HEIGHT * 0.1;
-
-class Mob {
-    constructor(hp, ) {
-        this.maxHealth = this.health = hp;
-
-        this.healthBar = __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.group(null);
-        this._healthBar = this.healthBar.add(new Phaser.Sprite(__WEBPACK_IMPORTED_MODULE_0__game__["default"], 0, 0, 'blank'));
-        this._healthBar.height = 1;
-        this._healthBar.width = 40;
-        this._healthBar.tint = 0xFF0000;
-        this._healthBar.anchor.set(0.5, 1);
-        this.healthBar.scale.y = HEALTH_BAR_HEIGHT;
-    }
-
-    hit() {
-        this.health--;
-        this._healthBar.scale.y = 0.1 * Math.max(this.health / this.maxHealth, 0);
-        this.sprite.tint = 0xFF9090;
-        setTimeout(() => { // forgive me pls for using a timeout
-            this.sprite.tint = 0xFFFFFF; // reset tint
-        }, 100);
-    }
-
-    attack(mob, onHit) {
-        let targetHealth = mob.health;
-
-        __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.tween(this.sprite).to({
-            x: mob.sprite.x - 100,
-            y: mob.sprite.y
-        }, 500).chain(
-            __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.tween(this.sprite).to({
-                x: this.sprite.x,
-                y: this.sprite.y,
-            }, 500)
-        ).start().onComplete.addOnce(() => {
-            // phaser is being dumb and firing this event multiple times so don't do anything if the target enemy's health has changed
-            if (mob.health !== targetHealth) return;
-
-            mob.hit();
-            onHit();
-        });
-    }
+try {
+	// This works if eval is allowed (see CSP)
+	g = g || Function("return this")() || (1,eval)("this");
+} catch(e) {
+	// This works if the window reference is available
+	if(typeof window === "object")
+		g = window;
 }
-/* harmony export (immutable) */ __webpack_exports__["a"] = Mob;
+
+// g can still be undefined, but nothing to do about it...
+// We return undefined, instead of nothing here, so it's
+// easier to handle this case. if(!global) { ...}
+
+module.exports = g;
 
 
 /***/ }),
-/* 7 */
+/* 6 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -533,14 +487,213 @@ class Button {
 
 
 /***/ }),
-/* 8 */
-/***/ (function(module, exports, __webpack_require__) {
+/* 7 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-/* WEBPACK VAR INJECTION */(function(global) {module.exports = global["PIXI"] = __webpack_require__(9);
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__defs__ = __webpack_require__(1);
+
+
+
+const HEALTH_BAR_HEIGHT = __WEBPACK_IMPORTED_MODULE_1__defs__["a" /* default */].GAME_HEIGHT * 0.1;
+
+class Mob {
+    constructor(hp, ) {
+        this.maxHealth = this.health = hp;
+
+        this.healthBar = __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.group(null);
+        this._healthBar = this.healthBar.add(new Phaser.Sprite(__WEBPACK_IMPORTED_MODULE_0__game__["default"], 0, 0, 'blank'));
+        this._healthBar.height = 1;
+        this._healthBar.width = 40;
+        this._healthBar.tint = 0xFF0000;
+        this._healthBar.anchor.set(0.5, 1);
+        this.healthBar.scale.y = HEALTH_BAR_HEIGHT;
+    }
+
+    hit(dmg=1) {
+        this.health -= dmg;
+        this._healthBar.scale.y = 0.1 * Math.max(this.health / this.maxHealth, 0);
+        this.sprite.tint = 0xFF9090;
+        setTimeout(() => { // forgive me pls for using a timeout
+            this.sprite.tint = 0xFFFFFF; // reset tint
+        }, 100);
+    }
+
+    attack(mob, dmg, onHit) {
+        let targetHealth = mob.health;
+
+        __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.tween(this.sprite).to({
+            x: mob.sprite.x - 100,
+            y: mob.sprite.y
+        }, 500).chain(
+            __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.tween(this.sprite).to({
+                x: this.sprite.x,
+                y: this.sprite.y,
+            }, 500)
+        ).start().onComplete.addOnce(() => {
+            // phaser is being dumb and firing this event multiple times so don't do anything if the target enemy's health has changed
+            if (mob.health !== targetHealth) return;
+
+            mob.hit(dmg);
+            onHit();
+        });
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = Mob;
+
+
+/***/ }),
+/* 8 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__state__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__defs__ = __webpack_require__(1);
+
+
+
+
+class GroupSwipe {
+    constructor(parentGroup, group, pageWidth, pageHeight, horizontal=false, maskPage=false, incrementSize=1, increments=null, dragCallback=(dist)=>{}) {
+        this.dragging = false;
+        this.pageWidth = pageWidth;
+        this.pageHeight = pageHeight;
+        this.horizontal = horizontal;
+        this.increments = increments || Math.floor((horizontal? pageWidth : pageHeight) / incrementSize);
+        this.incrementSize = incrementSize;
+        this.dragCallback = dragCallback;
+        this.group = group;
+        this.swipeBox = parentGroup.add(new Phaser.Sprite(__WEBPACK_IMPORTED_MODULE_0__game__["default"], 0, 0, 'blank'));
+        this.swipeBox.alpha = 0;
+        this.dragStartX = this.dragStartY = 0;
+
+        parentGroup.sendToBack(this.swipeBox);
+        this.swipeBox.width = pageWidth;
+        this.swipeBox.height = pageHeight;
+        this.maskPage = maskPage;
+        if (this.maskPage) {
+            this.pageMask = parentGroup.addChild(new Phaser.Graphics(__WEBPACK_IMPORTED_MODULE_0__game__["default"], 0, 0));
+            this.pageMask.beginFill(0xffffff);
+            this.pageMask.drawRect(0, 0, pageWidth, pageHeight);
+            group.mask = this.pageMask;
+        }
+
+        this.swipeBox.inputEnabled = true;
+        this.swipeBox.input.enableDrag();
+        this.swipeBox.input.setDragLock(this.horizontal, !this.horizontal); // disable vertical drag
+
+        this.swipeBox.events.onDragStart.add(this.onDragStart, this);
+        this.swipeBox.events.onDragStop.add(this.onDragStop, this);
+    }
+
+    setSwipeBoxAnchor(x, y) {
+        this.swipeBox.anchor.set(x, y);
+        if (this.maskPage) {
+            this.pageMask.x = -this.swipeBox.anchor.x * this.pageWidth;
+            this.pageMask.y = -this.swipeBox.anchor.y * this.pageHeight;
+        }
+    }
+
+    _setGroupPos() {
+        this.group.x = this.swipeBox.x + this.dragStartX;
+        this.group.y = this.swipeBox.y + this.dragStartY;
+
+        if (-this.group.x < 0) this.group.x = 0;
+        else if (Math.ceil(-this.group.x / this.incrementSize) >= this.increments) this.group.x = -(this.increments - 1) * this.incrementSize;
+
+        if (-this.group.y < 0) this.group.y = 0;
+        else if (Math.ceil(-this.group.y / this.incrementSize) >= this.increments) this.group.y = -(this.increments - 1) * this.incrementSize;
+    }
+
+    update() {
+        if (this.dragging) {
+            this._setGroupPos();
+        }
+    }
+
+    onDragStart() {
+        this.dragging = true;
+        this.dragStartX = this.group.x;
+        this.dragStartY = this.group.y;
+    }
+
+    onDragStop() {
+        this.dragging = false;
+        this._setGroupPos();
+        this.swipeBox.x = this.swipeBox.y = 0;
+
+        var off = 0, dist = 0, incrementPressed = 0;
+        if (this.horizontal) {
+            off = Math.round(this.group.x / this.incrementSize);
+            dist = Math.round(this.dragStartX / this.incrementSize) - off;
+            incrementPressed = Math.floor((this.swipeBox.input.globalToLocal(this.swipeBox.input.downPoint).x - this.group.x) / this.incrementSize);
+            __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.tween(this.group).to({ x: off * this.incrementSize }, 300, Phaser.Easing.Quadratic.Out).start();
+        } else {
+            off = Math.round(this.group.y / this.incrementSize);
+            dist = Math.round(this.dragStartY / this.incrementSize) - off;
+            incrementPressed = Math.floor((this.swipeBox.input.globalToLocal(this.swipeBox.input.downPoint).y - this.group.y) / this.incrementSize);
+            __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.tween(this.group).to({ y: off * this.incrementSize }, 300, Phaser.Easing.Quadratic.Out).start();
+        }
+
+        this.dragCallback(Math.abs(dist), incrementPressed);
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = GroupSwipe;
+
 
 /***/ }),
 /* 9 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__defs__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__InfoRow__ = __webpack_require__(4);
+
+
+
+
+const itemNameTextStyle = {
+    "font": "Verdana",
+    fill: "#111",
+    fontSize: "70px",
+    boundsAlignV: 'middle',
+    wordWrap: true,
+    wordWrapWidth: __WEBPACK_IMPORTED_MODULE_2__InfoRow__["a" /* default */].WIDTH * 0.6
+};
+
+const costTextStyle = {
+    "font": "Verdana",
+    fill: "#0A0A0A",
+    fontSize: "65px",
+    fontWeight: "bold"
+};
+
+class ItemInfo {
+    constructor(item) {
+        this.item = item;
+        this.group = new Phaser.Group(__WEBPACK_IMPORTED_MODULE_0__game__["default"], null);
+
+        this.group.addChild(new Phaser.Sprite(__WEBPACK_IMPORTED_MODULE_0__game__["default"], __WEBPACK_IMPORTED_MODULE_2__InfoRow__["a" /* default */].HEIGHT / 2, __WEBPACK_IMPORTED_MODULE_2__InfoRow__["a" /* default */].HEIGHT / 2, item.sprite)).anchor.set(0.5);
+        this.group.addChild(new Phaser.Text(__WEBPACK_IMPORTED_MODULE_0__game__["default"], 0, 0, item.name, itemNameTextStyle))
+            .setTextBounds(__WEBPACK_IMPORTED_MODULE_2__InfoRow__["a" /* default */].WIDTH * 0.175, 0, __WEBPACK_IMPORTED_MODULE_2__InfoRow__["a" /* default */].WIDTH * 0.6, __WEBPACK_IMPORTED_MODULE_2__InfoRow__["a" /* default */].HEIGHT);
+        this.group.addChild(new Phaser.Text(__WEBPACK_IMPORTED_MODULE_0__game__["default"], __WEBPACK_IMPORTED_MODULE_2__InfoRow__["a" /* default */].WIDTH * 0.95, __WEBPACK_IMPORTED_MODULE_2__InfoRow__["a" /* default */].HEIGHT / 2, item.cost + "g", costTextStyle)).anchor.set(1, 0.5);
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = ItemInfo;
+
+
+/***/ }),
+/* 10 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(global) {module.exports = global["PIXI"] = __webpack_require__(11);
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5)))
+
+/***/ }),
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /**
@@ -8104,14 +8257,14 @@ PIXI.TextureUvs = function()
 }).call(this);
 
 /***/ }),
-/* 10 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
-/* WEBPACK VAR INJECTION */(function(global) {module.exports = global["p2"] = __webpack_require__(11);
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
+/* WEBPACK VAR INJECTION */(function(global) {module.exports = global["p2"] = __webpack_require__(13);
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5)))
 
 /***/ }),
-/* 11 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var require;var require;/**
@@ -21738,14 +21891,14 @@ World.prototype.raycast = function(result, ray){
 
 
 /***/ }),
-/* 12 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
-/* WEBPACK VAR INJECTION */(function(global) {module.exports = global["Phaser"] = __webpack_require__(13);
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
+/* WEBPACK VAR INJECTION */(function(global) {module.exports = global["Phaser"] = __webpack_require__(15);
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5)))
 
 /***/ }),
-/* 13 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(process) {/**
@@ -108512,10 +108665,10 @@ PIXI.canUseNewCanvasBlendModes = function () {
 * "What matters in this life is not what we do but what we do for others, the legacy we leave and the imprint we make." - Eric Meyer
 */
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(14)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(16)))
 
 /***/ }),
-/* 14 */
+/* 16 */
 /***/ (function(module, exports) {
 
 // shim for using process in browser
@@ -108705,7 +108858,7 @@ process.umask = function() { return 0; };
 
 
 /***/ }),
-/* 15 */
+/* 17 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -108771,7 +108924,7 @@ let loadPromises = [];
 
 
 /***/ }),
-/* 16 */
+/* 18 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -108779,8 +108932,16 @@ let loadPromises = [];
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__state__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__defs__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__utils__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__player__ = __webpack_require__(17);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__enemy__ = __webpack_require__(18);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__player__ = __webpack_require__(19);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__enemy__ = __webpack_require__(20);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__components_Button__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__components_RowSelectPopup__ = __webpack_require__(21);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__components_ItemInfo__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__components_SystemMessage__ = __webpack_require__(23);
+
+
+
+
 
 
 
@@ -108797,11 +108958,23 @@ const uiBarTextStyle = {
     align: "center"
 };
 
+const labelTextStyle = {
+    "font": "Verdana",
+    fill: "#111",
+    fontSize: "70px"
+};
+
+let systemMessage;
 let combatTurn;
 let player;
 let enemies;
 let combatDelayTimer;
 let uiBarGroup;
+let actionButtonGroup;
+let attackButton, skillButton, itemButton, pressedButton = null;
+let attackSelect, skillSelect, itemSelect, openedSelect = null;
+let selectGroup;
+let selectedItem = null;
 
 /* harmony default export */ __webpack_exports__["a"] = ({
     create: () => {
@@ -108809,7 +108982,6 @@ let uiBarGroup;
         combatDelayTimer = COMBAT_START_DELAY;
 
         __WEBPACK_IMPORTED_MODULE_0__game__["default"].stage.backgroundColor = "#908077";
-        __WEBPACK_IMPORTED_MODULE_0__game__["default"].world.setBounds(0, 0, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH * 100, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT);
 
         //game.add.sprite(0, 0, 'test');
 
@@ -108840,6 +109012,11 @@ let uiBarGroup;
             uiBarTextStyle,
         )).anchor.set(0.5, 0.5);
 
+        let line = uiBarGroup.add(new Phaser.Sprite(__WEBPACK_IMPORTED_MODULE_0__game__["default"], 0, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT * 0.16 * 3 + 23, 'blank'));
+        line.width = __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].LEFT_UI_BAR_WIDTH;
+        line.height = 2 * __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].MSR;
+        line.tint = 0x555555;
+
         for (var i = 0; i < enemies.length; i++) {
             let enemy = enemies[i];
             uiBarGroup.add(new Phaser.Text(__WEBPACK_IMPORTED_MODULE_0__game__["default"],
@@ -108852,46 +109029,130 @@ let uiBarGroup;
             enemy.healthBar.x = __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].LEFT_UI_BAR_WIDTH / 2;
             enemy.healthBar.y = __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT * 0.16 * (i + 1);
 
-            let line = uiBarGroup.add(new Phaser.Sprite(__WEBPACK_IMPORTED_MODULE_0__game__["default"], 0, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT * 0.16 * (i + 1) + 23, 'blank'));
-            line.width = __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].LEFT_UI_BAR_WIDTH;
-            line.height = 2 * __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].MSR;
-            line.tint = 0x555555;
+            if (i < 2) {
+                let line = uiBarGroup.add(new Phaser.Sprite(__WEBPACK_IMPORTED_MODULE_0__game__["default"], 0, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT * 0.16 * (i + 1) + 23, 'blank'));
+                line.width = __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].LEFT_UI_BAR_WIDTH;
+                line.height = 2 * __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].MSR;
+                line.tint = 0x555555;
+            }
         }
+
+        actionButtonGroup = __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.group()
+        itemButton = new __WEBPACK_IMPORTED_MODULE_6__components_Button__["a" /* default */](__WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH * 0.85, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT - __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH * 0.15);
+        itemButton.sprite.addChild(new Phaser.Sprite(__WEBPACK_IMPORTED_MODULE_0__game__["default"], 0, -itemButton.sprite.height * 0.2, 'blank')).anchor.set(0.5);
+        itemButton.sprite.addChild(new Phaser.Text(__WEBPACK_IMPORTED_MODULE_0__game__["default"], 0, itemButton.sprite.height * 0.3, 'Item', labelTextStyle)).anchor.set(0.5);
+        skillButton = new __WEBPACK_IMPORTED_MODULE_6__components_Button__["a" /* default */](__WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH * 0.85, itemButton.sprite.y - itemButton.sprite.height / 2 - __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH * 0.15);
+        skillButton.sprite.addChild(new Phaser.Sprite(__WEBPACK_IMPORTED_MODULE_0__game__["default"], 0, -skillButton.sprite.height * 0.2, 'blank')).anchor.set(0.5);
+        skillButton.sprite.addChild(new Phaser.Text(__WEBPACK_IMPORTED_MODULE_0__game__["default"], 0, skillButton.sprite.height * 0.3, 'Skill', labelTextStyle)).anchor.set(0.5);
+        attackButton = new __WEBPACK_IMPORTED_MODULE_6__components_Button__["a" /* default */](__WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH * 0.85, skillButton.sprite.y - skillButton.sprite.height / 2 - __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH * 0.15);
+        attackButton.sprite.addChild(new Phaser.Sprite(__WEBPACK_IMPORTED_MODULE_0__game__["default"], 0, -attackButton.sprite.height * 0.2, 'blank')).anchor.set(0.5);
+        attackButton.sprite.addChild(new Phaser.Text(__WEBPACK_IMPORTED_MODULE_0__game__["default"], 0, attackButton.sprite.height * 0.3, 'Attack', labelTextStyle)).anchor.set(0.5);
+        itemButton.toggle = skillButton.toggle = attackButton.toggle = true;
+        itemButton.allowDepress = skillButton.allowDepress = attackButton.allowDepress = false;
+
+        selectGroup = __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.group();
+        selectGroup.x = __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH * 0.3;
+        selectGroup.y = __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT * 0.67;
+        var onChangeCallback = (select, button) => (pressed) => {
+            if (pressed) {
+                if (openedSelect) openedSelect.group.visible = false;
+                if (pressedButton) pressedButton.setPressed(false);
+                openedSelect = select;
+                openedSelect.group.visible = true;
+                pressedButton = button;
+            }
+        };
+
+        let weapons = __WEBPACK_IMPORTED_MODULE_1__state__["a" /* default */].items.filter((i) => i.type !== __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].ITEM_TYPES.CONSUMABLE);
+        attackSelect = new __WEBPACK_IMPORTED_MODULE_7__components_RowSelectPopup__["a" /* default */](selectGroup, weapons.map((i) => ({
+            label: i.name, value: i.damage
+        })));
+        attackSelect.onSelect = (index) => {
+            selectedItem = weapons[index];
+            systemMessage.showText("Select a target");
+            openedSelect.group.visible = false;
+            pressedButton.setPressed(false);
+        };
+        attackSelect.group.visible = false;
+        attackButton.onChange = onChangeCallback(attackSelect, attackButton);
+
+        let skills = __WEBPACK_IMPORTED_MODULE_1__state__["a" /* default */].skills;
+        skillSelect = new __WEBPACK_IMPORTED_MODULE_7__components_RowSelectPopup__["a" /* default */](selectGroup, skills.map((s) => ({
+            label: s.name, value: s.mpCost
+        })));
+        skillSelect.onSelect = (index) => {
+            selectedItem = skills[index];
+            systemMessage.showText("Select a target");
+            openedSelect.group.visible = false;
+            pressedButton.setPressed(false);
+        };
+        skillSelect.group.visible = false;
+        skillButton.onChange = onChangeCallback(skillSelect, skillButton);
+
+        let items = __WEBPACK_IMPORTED_MODULE_1__state__["a" /* default */].items.filter((i) => i.type === __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].ITEM_TYPES.CONSUMABLE);
+        itemSelect = new __WEBPACK_IMPORTED_MODULE_7__components_RowSelectPopup__["a" /* default */](selectGroup, items.map((i) => ({
+            label: i.name, value: ''
+        })));
+        itemSelect.onSelect = (index) => {
+            selectedItem = items[index];
+            openedSelect.group.visible = false;
+            pressedButton.setPressed(false);
+        };
+        itemSelect.group.visible = false;
+        itemButton.onChange = onChangeCallback(itemSelect, itemButton);
+
+        systemMessage = new __WEBPACK_IMPORTED_MODULE_9__components_SystemMessage__["a" /* default */]();
+        let levelText = (__WEBPACK_IMPORTED_MODULE_1__state__["a" /* default */].level + 1) + (__WEBPACK_IMPORTED_MODULE_1__state__["a" /* default */].level % 10 === 0 && __WEBPACK_IMPORTED_MODULE_1__state__["a" /* default */].level !== 10? 'st': (__WEBPACK_IMPORTED_MODULE_1__state__["a" /* default */].level === 1? 'nd': (__WEBPACK_IMPORTED_MODULE_1__state__["a" /* default */].level === 2? 'rd':'th')));
+        systemMessage.showText(['You have reached the ' + levelText + ' floor.', 'Your turn!']);
     },
 
     update: () => {
+        attackSelect.update();
+        skillSelect.update();
+        itemSelect.update();
+
         if (combatDelayTimer <= 0) {
             let usedTurn = false;
             if (combatTurn === -1) {
                 // player's turn
-                let targetEnemy, targetEnemyPos;
-                let combatOver = true;
-                for (var p = 0; p < enemies.length; p++) {
-                    if (enemies[p]) {
-                        combatOver = false;
-                        if (enemies[p].sprite.input.justPressed()) {
-                            targetEnemyPos = p;
-                            targetEnemy = enemies[p];
-                            break;
+                if (selectedItem !== null && selectedItem.type === __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].ITEM_TYPES.CONSUMABLE) {
+                    // use consumable
+                    usedTurn = true;
+                } else if (selectedItem !== null) {
+                    let targetEnemy, targetEnemyPos;
+                    let combatOver = true;
+                    for (var p = 0; p < enemies.length; p++) {
+                        if (enemies[p]) {
+                            combatOver = false;
+                            if (enemies[p].sprite.input.justPressed()) {
+                                targetEnemyPos = p;
+                                targetEnemy = enemies[p];
+                                break;
+                            }
                         }
                     }
-                }
 
-                if (targetEnemy) {
-                    usedTurn = true;
-                    combatDelayTimer = 1000; // delay next attack until animations are done
+                    if (targetEnemy) {
+                        usedTurn = true;
+                        combatDelayTimer = 1000; // delay next attack until animations are done
 
-                    player.attack(targetEnemy, () => {
-                        if (targetEnemy.health <= 0) {
-                            // KILL IT
-                            delete enemies[targetEnemyPos];
-                            enemies.splice(targetEnemyPos, 1);
-                            targetEnemy.sprite.destroy();
-                        }
-                    });
-                } else if (combatOver) {
-                    __WEBPACK_IMPORTED_MODULE_1__state__["a" /* default */].level++;
-                    __WEBPACK_IMPORTED_MODULE_0__game__["default"].state.restart(); // restart state with new level
+                        player.attack(targetEnemy, selectedItem.damage, () => {
+                            if (targetEnemy.health <= 0) {
+                                // KILL IT
+                                delete enemies[targetEnemyPos];
+                                enemies.splice(targetEnemyPos, 1);
+                                targetEnemy.sprite.destroy();
+
+                                systemMessage.showText("Killed monster!");
+                            } else {
+                                systemMessage.showText("Attacked monster for " + selectedItem.damage + "hp!");
+                            }
+                        });
+                    } else if (combatOver) {
+                        systemMessage.showText("Floor complete!");
+                        __WEBPACK_IMPORTED_MODULE_1__state__["a" /* default */].level++;
+                        __WEBPACK_IMPORTED_MODULE_0__game__["default"].state.restart(); // restart state with new level
+                    }
                 }
             } else {
                 // enemy's turn
@@ -108901,7 +109162,7 @@ let uiBarGroup;
                     combatDelayTimer = 1000; // delay next attack until animations are done
                     enemy.attack(player, () => {
                         if (player.health <= 0) {
-                            console.log("LOSE");
+                            systemMessage.showText("You lose!");
                         }
                     });
                 }
@@ -108909,7 +109170,10 @@ let uiBarGroup;
 
             if (usedTurn) {
                 combatTurn++;
-                if (combatTurn == enemies.length) combatTurn = -1; // reset to player's turn
+                if (combatTurn >= enemies.length) {
+                    combatTurn = -1; // reset to player's turn
+                    systemMessage.queueText("Your turn!");
+                }
             }
         } else if (combatDelayTimer > 0) {
             combatDelayTimer -= __WEBPACK_IMPORTED_MODULE_0__game__["default"].time.elapsed;
@@ -108918,14 +109182,14 @@ let uiBarGroup;
 });
 
 /***/ }),
-/* 17 */
+/* 19 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__state__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__defs__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__mob__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__mob__ = __webpack_require__(7);
 
 
 
@@ -108947,14 +109211,14 @@ class Player extends __WEBPACK_IMPORTED_MODULE_3__mob__["a" /* default */] {
 
 
 /***/ }),
-/* 18 */
+/* 20 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__state__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__defs__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__mob__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__mob__ = __webpack_require__(7);
 
 
 
@@ -108964,6 +109228,7 @@ class Enemy extends __WEBPACK_IMPORTED_MODULE_3__mob__["a" /* default */] {
     constructor(x, y, type) {
         let DATA = __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].ENEMIES[type];
         super(DATA.health)
+        this.DATA = DATA;
 
         this.sprite = __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.sprite(x, y, DATA.sprite);
         this.sprite.anchor.set(0.5, 1);
@@ -108971,12 +109236,191 @@ class Enemy extends __WEBPACK_IMPORTED_MODULE_3__mob__["a" /* default */] {
 
         //this.sprite.addChild(this.healthBar);
     }
+
+    attack(target, onHit) {
+    	super.attack(target, this.DATA.damage, onHit);
+    }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = Enemy;
 
 
 /***/ }),
-/* 19 */
+/* 21 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__defs__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__utils__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__GroupSwipe__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__SmallInfoRow__ = __webpack_require__(22);
+
+
+
+
+
+
+const WIDTH = __WEBPACK_IMPORTED_MODULE_4__SmallInfoRow__["a" /* default */].WIDTH;
+const HEIGHT = __WEBPACK_IMPORTED_MODULE_4__SmallInfoRow__["a" /* default */].HEIGHT * 5;
+
+class RowSelectPopup {
+    constructor(parentGroup, items) {
+        var scrollBoxBmd = __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.bitmapData(WIDTH * 1.02, HEIGHT * 1.02, '', false);
+        scrollBoxBmd.ctx.fillStyle = "#EEEEF0";
+        scrollBoxBmd.ctx.strokeStyle = "#333";
+        scrollBoxBmd.ctx.lineWidth = __WEBPACK_IMPORTED_MODULE_1__defs__["a" /* default */].MSR;
+        __WEBPACK_IMPORTED_MODULE_2__utils__["a" /* default */].DrawRoundedRect(scrollBoxBmd.ctx, 0, 0, WIDTH * 1.02, HEIGHT * 1.02, 5);
+
+        this.group = parentGroup.add(new Phaser.Group(__WEBPACK_IMPORTED_MODULE_0__game__["default"], null));
+
+        this.group.add(new Phaser.Sprite(__WEBPACK_IMPORTED_MODULE_0__game__["default"], -WIDTH * 0.01, -HEIGHT * 0.01, scrollBoxBmd));
+        let scrollGroup = this.group.add(new Phaser.Group(__WEBPACK_IMPORTED_MODULE_0__game__["default"], null));
+
+        for (var i = 0; i < items.length; i++) {
+            scrollGroup.add(new __WEBPACK_IMPORTED_MODULE_4__SmallInfoRow__["a" /* default */](items[i].label, items[i].value).group).y = i * __WEBPACK_IMPORTED_MODULE_4__SmallInfoRow__["a" /* default */].HEIGHT;
+        }
+
+        this.groupSwipe = new __WEBPACK_IMPORTED_MODULE_3__GroupSwipe__["a" /* default */](this.group, scrollGroup, WIDTH, HEIGHT, false, true,
+            __WEBPACK_IMPORTED_MODULE_4__SmallInfoRow__["a" /* default */].HEIGHT, items.length, (dist, incrementPressed) => {
+                if (dist === 0 && incrementPressed < items.length) {
+                    this.onSelect(incrementPressed);
+                }
+            }
+        );
+    }
+
+    onSelect(index) {} // override
+
+    update() {
+        this.groupSwipe.update();
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = RowSelectPopup;
+
+
+/***/ }),
+/* 22 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__defs__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__InfoRow__ = __webpack_require__(4);
+
+
+
+
+const labelTextStyle = {
+    "font": "Verdana",
+    fill: "#111",
+    fontSize: "60px",
+    boundsAlignV: 'middle',
+    fontWeight: "bold",
+    wordWrap: true,
+    wordWrapWidth: __WEBPACK_IMPORTED_MODULE_2__InfoRow__["a" /* default */].WIDTH * 0.6
+};
+
+const valueTextStyle = {
+    "font": "Verdana",
+    fill: "#0A0A0A",
+    fontSize: "55px",
+    fontWeight: "bold"
+};
+
+const WIDTH = __WEBPACK_IMPORTED_MODULE_1__defs__["a" /* default */].GAME_WIDTH * 0.4;
+const HEIGHT = 100;
+
+class SmallInfoRow {
+    constructor(label, value) {
+        this.group = new Phaser.Group(__WEBPACK_IMPORTED_MODULE_0__game__["default"], null);
+
+        this.background = this.group.add(new Phaser.Sprite(__WEBPACK_IMPORTED_MODULE_0__game__["default"], 0, 0, 'blank'));
+        this.background.width = WIDTH;
+        this.background.height = HEIGHT;
+        this.background.tint = 0x000000;
+        this.background.alpha = 0.05;
+
+        let borderBottom = this.group.add(new Phaser.Sprite(__WEBPACK_IMPORTED_MODULE_0__game__["default"], 0, HEIGHT, 'blank'));
+        borderBottom.width = WIDTH;
+        borderBottom.height = __WEBPACK_IMPORTED_MODULE_1__defs__["a" /* default */].MSR;
+        borderBottom.tint = 0x777777;
+
+        this.group.addChild(new Phaser.Text(__WEBPACK_IMPORTED_MODULE_0__game__["default"], 0, 0, label, labelTextStyle))
+            .setTextBounds(WIDTH * 0.05, 0, WIDTH * 0.6, HEIGHT);
+        this.group.addChild(new Phaser.Text(__WEBPACK_IMPORTED_MODULE_0__game__["default"], WIDTH * 0.95, HEIGHT / 2, value, valueTextStyle)).anchor.set(1, 0.5);
+    }
+}
+
+SmallInfoRow.WIDTH = WIDTH;
+SmallInfoRow.HEIGHT = HEIGHT;
+
+/* harmony default export */ __webpack_exports__["a"] = (SmallInfoRow);
+
+/***/ }),
+/* 23 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__defs__ = __webpack_require__(1);
+
+
+
+const messageTextStyle = {
+    font: "Verdana",
+    fill: "#E5E5E5",
+    fontSize: "80px",
+    fontWeight: "bold",
+    boundsAlignH: 'center',
+    wordWrap: true,
+    wordWrapWidth: __WEBPACK_IMPORTED_MODULE_1__defs__["a" /* default */].GAME_WIDTH - __WEBPACK_IMPORTED_MODULE_1__defs__["a" /* default */].LEFT_UI_BAR_WIDTH
+};
+
+class SystemMessage {
+    constructor(item) {
+        this.text = __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.text(__WEBPACK_IMPORTED_MODULE_1__defs__["a" /* default */].LEFT_UI_BAR_WIDTH, 0, '', messageTextStyle)
+            .setTextBounds(0, __WEBPACK_IMPORTED_MODULE_1__defs__["a" /* default */].GAME_HEIGHT * 0.1, messageTextStyle.wordWrapWidth, 300);
+        this.text.alpha = 0;
+
+        this.textQueue = [];
+    }
+
+    showNextText() {
+        var t = this.textQueue.pop();
+        if (t) {
+            this.text.text = t; // hmmmmmm
+            // 2nd .to(...) is just to delay the onComplete
+            let tween = __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.tween(this.text).to({ alpha: 1 }).to({ alpha: 1 }, 0, "Linear", false, 1500);
+            tween.onComplete.add(this.showNextText, this);
+            tween.start();
+        }
+    }
+
+    queueText(text) {
+        this.textQueue.reverse().push(text);
+        this.textQueue.reverse();
+    }
+
+    showText(text) {
+        if (typeof(text) === typeof([])) {
+            // put in reverse order so strings can be popped off
+            this.textQueue = text.reverse();
+        } else {
+            this.textQueue = [text];
+        }
+
+        this.showNextText();
+    }
+
+    hideText() {
+        __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.tween(this.text).to({ alpha: 0 });
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = SystemMessage;
+
+
+/***/ }),
+/* 24 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -108984,7 +109428,7 @@ class Enemy extends __WEBPACK_IMPORTED_MODULE_3__mob__["a" /* default */] {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__state__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__defs__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__utils__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__components_NameDialog__ = __webpack_require__(20);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__components_NameDialog__ = __webpack_require__(25);
 
 
 
@@ -109060,7 +109504,7 @@ const outlineTextStyle = {
 });
 
 /***/ }),
-/* 20 */
+/* 25 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -109143,7 +109587,7 @@ class NameDialog {
 
 
 /***/ }),
-/* 21 */
+/* 26 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -109151,11 +109595,11 @@ class NameDialog {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__state__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__defs__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__utils__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__components_Button__ = __webpack_require__(7);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__components_GroupSwipe__ = __webpack_require__(22);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__components_InfoRow__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__components_ItemInfo__ = __webpack_require__(23);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__components_SkillInfo__ = __webpack_require__(24);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__components_Button__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__components_GroupSwipe__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__components_InfoRow__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__components_ItemInfo__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__components_SkillInfo__ = __webpack_require__(27);
 
 
 
@@ -109232,20 +109676,11 @@ let remainingSp;
 
         __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.text(__WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH / 2, 120, "Gear Up Your Character!", titleTextStyle).anchor.set(0.5);
 
-        var startButton = new __WEBPACK_IMPORTED_MODULE_4__components_Button__["a" /* default */](__WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH / 2, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT * 0.925, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH * 0.925, 270);
-        startButton.onChange = (pressed) => {
-            if (pressed) {
-                __WEBPACK_IMPORTED_MODULE_0__game__["default"].state.start("Main");
-            }
-        };
-
-        startButton.sprite.addChild(new Phaser.Text(__WEBPACK_IMPORTED_MODULE_0__game__["default"], 0, 0, "START!!", startTextStyle)).anchor.set(0.5);
-
         // create equipment selector
         __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.text(30, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT * 0.1, "EQUIPMENT", outlineTextStyle);
         moneyText = __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.text(__WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH * 0.9, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT * 0.1, remainingMoney + "g", labelTextStyle);
         moneyText.anchor.set(1, 0);
-        let equipmentOptions = Object.values(__WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].ITEMS);
+        let equipmentOptions = Object.values(__WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].ITEMS).filter((i) => i.type !== __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].ITEM_TYPES.SKILL);
         let equipmentGroup = __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.group();
         equipmentGroup.x = __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH / 2;
         equipmentGroup.y = __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT * 0.175;
@@ -109285,7 +109720,7 @@ let remainingSp;
         __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.text(30, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT * 0.5, "SKILLS", outlineTextStyle);
         spText = __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.text(__WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH * 0.9, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT * 0.5, remainingSp + "sp", labelTextStyle);
         spText.anchor.set(1, 0);
-        let skillOptions = Object.values(__WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].SKILLS);
+        let skillOptions = Object.values(__WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].ITEMS).filter((i) => i.type === __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].ITEM_TYPES.SKILL);
         let skillsGroup = __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.group();
         skillsGroup.x = __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH / 2;
         skillsGroup.y = __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT * 0.575;
@@ -109320,6 +109755,24 @@ let remainingSp;
             }
         );
         skillsGroupSwipe.setSwipeBoxAnchor(0.5, 0);
+
+        var startButton = new __WEBPACK_IMPORTED_MODULE_4__components_Button__["a" /* default */](__WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH / 2, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT * 0.925, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH * 0.925, 270);
+        startButton.onChange = (pressed) => {
+            if (pressed) {
+                __WEBPACK_IMPORTED_MODULE_1__state__["a" /* default */].items = [];
+                for (var i = 0; i < equipmentRows.length; i++) {
+                    if (equipmentRows[i].selected) __WEBPACK_IMPORTED_MODULE_1__state__["a" /* default */].items.push(equipmentOptions[i]);
+                }
+
+                __WEBPACK_IMPORTED_MODULE_1__state__["a" /* default */].skills = [];
+                for (var i = 0; i < skillRows.length; i++) {
+                    if (skillRows[i].selected) __WEBPACK_IMPORTED_MODULE_1__state__["a" /* default */].skills.push(skillOptions[i]);
+                }
+                __WEBPACK_IMPORTED_MODULE_0__game__["default"].state.start("Main");
+            }
+        };
+
+        startButton.sprite.addChild(new Phaser.Text(__WEBPACK_IMPORTED_MODULE_0__game__["default"], 0, 0, "START!!", startTextStyle)).anchor.set(0.5);
     },
 
     update: () => {
@@ -109329,155 +109782,13 @@ let remainingSp;
 });
 
 /***/ }),
-/* 22 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__state__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__defs__ = __webpack_require__(1);
-
-
-
-
-class GroupSwipe {
-    constructor(parentGroup, group, pageWidth, pageHeight, horizontal=false, maskPage=false, incrementSize=1, increments=null, dragCallback=(dist)=>{}) {
-        this.dragging = false;
-        this.pageWidth = pageWidth;
-        this.pageHeight = pageHeight;
-        this.horizontal = horizontal;
-        this.increments = increments || Math.floor((horizontal? pageWidth : pageHeight) / incrementSize);
-        this.incrementSize = incrementSize;
-        this.dragCallback = dragCallback;
-        this.group = group;
-        this.swipeBox = parentGroup.add(new Phaser.Sprite(__WEBPACK_IMPORTED_MODULE_0__game__["default"], 0, 0, 'blank'));
-        this.swipeBox.alpha = 0;
-        this.dragStartX = this.dragStartY = 0;
-
-        parentGroup.sendToBack(this.swipeBox);
-        this.swipeBox.width = pageWidth;
-        this.swipeBox.height = pageHeight;
-        this.maskPage = maskPage;
-        if (this.maskPage) {
-            this.pageMask = parentGroup.addChild(new Phaser.Graphics(__WEBPACK_IMPORTED_MODULE_0__game__["default"], 0, 0));
-            this.pageMask.beginFill(0xffffff);
-            this.pageMask.drawRect(0, 0, pageWidth, pageHeight);
-            group.mask = this.pageMask;
-        }
-
-        this.swipeBox.inputEnabled = true;
-        this.swipeBox.input.enableDrag();
-        this.swipeBox.input.setDragLock(this.horizontal, !this.horizontal); // disable vertical drag
-
-        this.swipeBox.events.onDragStart.add(this.onDragStart, this);
-        this.swipeBox.events.onDragStop.add(this.onDragStop, this);
-    }
-
-    setSwipeBoxAnchor(x, y) {
-        this.swipeBox.anchor.set(x, y);
-        if (this.maskPage) {
-            this.pageMask.x = -this.swipeBox.anchor.x * this.pageWidth;
-            this.pageMask.y = -this.swipeBox.anchor.y * this.pageHeight;
-        }
-    }
-
-    _setGroupPos() {
-        this.group.x = this.swipeBox.x + this.dragStartX;
-        this.group.y = this.swipeBox.y + this.dragStartY;
-
-        if (-this.group.x < 0) this.group.x = 0;
-        else if (Math.ceil(-this.group.x / this.incrementSize) >= this.increments) this.group.x = -(this.increments - 1) * this.incrementSize;
-
-        if (-this.group.y < 0) this.group.y = 0;
-        else if (Math.ceil(-this.group.y / this.incrementSize) >= this.increments) this.group.y = -(this.increments - 1) * this.incrementSize;
-    }
-
-    update() {
-        if (this.dragging) {
-            this._setGroupPos();
-        }
-    }
-
-    onDragStart() {
-        this.dragging = true;
-        this.dragStartX = this.group.x;
-        this.dragStartY = this.group.y;
-    }
-
-    onDragStop() {
-        this.dragging = false;
-        this._setGroupPos();
-        this.swipeBox.x = this.swipeBox.y = 0;
-
-        var off = 0, dist = 0, incrementPressed = 0;
-        if (this.horizontal) {
-            off = Math.round(this.group.x / this.incrementSize);
-            dist = Math.round(this.dragStartX / this.incrementSize) - off;
-            incrementPressed = Math.floor((this.swipeBox.input.globalToLocal(this.swipeBox.input.downPoint).x - this.group.x) / this.incrementSize);
-            __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.tween(this.group).to({ x: off * this.incrementSize }, 300, Phaser.Easing.Quadratic.Out).start();
-        } else {
-            off = Math.round(this.group.y / this.incrementSize);
-            dist = Math.round(this.dragStartY / this.incrementSize) - off;
-            incrementPressed = Math.floor((this.swipeBox.input.globalToLocal(this.swipeBox.input.downPoint).y - this.group.y) / this.incrementSize);
-            __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.tween(this.group).to({ y: off * this.incrementSize }, 300, Phaser.Easing.Quadratic.Out).start();
-        }
-
-        this.dragCallback(Math.abs(dist), incrementPressed);
-    }
-}
-/* harmony export (immutable) */ __webpack_exports__["a"] = GroupSwipe;
-
-
-/***/ }),
-/* 23 */
+/* 27 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__defs__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__InfoRow__ = __webpack_require__(5);
-
-
-
-
-const itemNameTextStyle = {
-    "font": "Verdana",
-    fill: "#111",
-    fontSize: "70px",
-    boundsAlignV: 'middle',
-    wordWrap: true,
-    wordWrapWidth: __WEBPACK_IMPORTED_MODULE_2__InfoRow__["a" /* default */].WIDTH * 0.6
-};
-
-const costTextStyle = {
-    "font": "Verdana",
-    fill: "#0A0A0A",
-    fontSize: "65px",
-    fontWeight: "bold"
-};
-
-class ItemInfo {
-    constructor(item) {
-        this.item = item;
-        this.group = new Phaser.Group(__WEBPACK_IMPORTED_MODULE_0__game__["default"], null);
-
-        this.group.addChild(new Phaser.Sprite(__WEBPACK_IMPORTED_MODULE_0__game__["default"], __WEBPACK_IMPORTED_MODULE_2__InfoRow__["a" /* default */].HEIGHT / 2, __WEBPACK_IMPORTED_MODULE_2__InfoRow__["a" /* default */].HEIGHT / 2, item.sprite)).anchor.set(0.5);
-        this.group.addChild(new Phaser.Text(__WEBPACK_IMPORTED_MODULE_0__game__["default"], 0, 0, item.name, itemNameTextStyle))
-            .setTextBounds(__WEBPACK_IMPORTED_MODULE_2__InfoRow__["a" /* default */].WIDTH * 0.175, 0, __WEBPACK_IMPORTED_MODULE_2__InfoRow__["a" /* default */].WIDTH * 0.6, __WEBPACK_IMPORTED_MODULE_2__InfoRow__["a" /* default */].HEIGHT);
-        this.group.addChild(new Phaser.Text(__WEBPACK_IMPORTED_MODULE_0__game__["default"], __WEBPACK_IMPORTED_MODULE_2__InfoRow__["a" /* default */].WIDTH * 0.95, __WEBPACK_IMPORTED_MODULE_2__InfoRow__["a" /* default */].HEIGHT / 2, item.cost + "g", costTextStyle)).anchor.set(1, 0.5);
-    }
-}
-/* harmony export (immutable) */ __webpack_exports__["a"] = ItemInfo;
-
-
-/***/ }),
-/* 24 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__defs__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__InfoRow__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__InfoRow__ = __webpack_require__(4);
 
 
 
@@ -109513,7 +109824,7 @@ class SkillInfo {
 
 
 /***/ }),
-/* 25 */
+/* 28 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -109521,7 +109832,7 @@ class SkillInfo {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__state__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__defs__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__utils__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__components_Button__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__components_Button__ = __webpack_require__(6);
 
 
 
@@ -109644,7 +109955,7 @@ const continueTextStyle = {
 });
 
 /***/ }),
-/* 26 */
+/* 29 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";

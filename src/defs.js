@@ -13,6 +13,8 @@ const ITEM_TYPES = {
     RANGED: 1,
     MELEE: 2,
     ABILITY: 3,
+    CONSUMABLE: 4,
+    SKILL: 5,
 };
 
 export default {
@@ -26,7 +28,15 @@ export default {
 
     LEFT_UI_BAR_WIDTH: GAME_WIDTH * 0.12,
 
+    ITEM_TYPES,
     ITEMS: {
+        HEALTH_POTION: {
+            name: "Health Potion",
+            type: ITEM_TYPES.CONSUMABLE,
+            sprite: 'item',
+            cost: 200,
+            hpBuff: 75,
+        },
         WOODEN_SWORD: {
             name: "Wooden Sword",
             type: ITEM_TYPES.MELEE,
@@ -48,12 +58,10 @@ export default {
             damage: 50,
             cost: 500,
             mpCost: 10,
-        }
-    },
-
-    SKILLS: {
+        },
         HEAL_BUFF: {
             name: "Heal Buff",
+            type: ITEM_TYPES.SKILL,
             desc: "Gain HP",
             sprite: 'item',
             cost: 5,
@@ -65,6 +73,7 @@ export default {
         NORMAL: { // maybe add other stats like def?
             sprite: 'enemy',
             health: 90,
+            damage: 10,
             drop_rates: {
                 // key: item key, value: % chance of dropping
                 "STEEL_SWORD": 0.05,
@@ -74,6 +83,7 @@ export default {
         STRONGER: { // maybe add other stats like def?
             sprite: 'enemy',
             health: 150,
+            damage: 25,
             drop_rates: {
                 "STEEL_SWORD": 0.25,
                 "WAND": 0.1,

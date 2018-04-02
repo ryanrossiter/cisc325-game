@@ -4,6 +4,10 @@ import Defs from './defs';
 import Utils from './utils';
 import Player from './player';
 import Enemy from './enemy';
+import Button from './components/Button';
+import RowSelectPopup from './components/RowSelectPopup';
+import ItemInfo from './components/ItemInfo';
+import SystemMessage from './components/SystemMessage';
 
 const COMBAT_START_DELAY = 500;
 
@@ -14,11 +18,23 @@ const uiBarTextStyle = {
     align: "center"
 };
 
+const labelTextStyle = {
+    "font": "Verdana",
+    fill: "#111",
+    fontSize: "70px"
+};
+
+let systemMessage;
 let combatTurn;
 let player;
 let enemies;
 let combatDelayTimer;
 let uiBarGroup;
+let actionButtonGroup;
+let attackButton, skillButton, itemButton, pressedButton = null;
+let attackSelect, skillSelect, itemSelect, openedSelect = null;
+let selectGroup;
+let selectedItem = null;
 
 export default {
     create: () => {
@@ -26,7 +42,6 @@ export default {
         combatDelayTimer = COMBAT_START_DELAY;
 
         game.stage.backgroundColor = "#908077";
-        game.world.setBounds(0, 0, Defs.GAME_WIDTH * 100, Defs.GAME_HEIGHT);
 
         //game.add.sprite(0, 0, 'test');
 
@@ -57,6 +72,11 @@ export default {
             uiBarTextStyle,
         )).anchor.set(0.5, 0.5);
 
+        let line = uiBarGroup.add(new Phaser.Sprite(game, 0, Defs.GAME_HEIGHT * 0.16 * 3 + 23, 'blank'));
+        line.width = Defs.LEFT_UI_BAR_WIDTH;
+        line.height = 2 * Defs.MSR;
+        line.tint = 0x555555;
+
         for (var i = 0; i < enemies.length; i++) {
             let enemy = enemies[i];
             uiBarGroup.add(new Phaser.Text(game,
@@ -69,46 +89,130 @@ export default {
             enemy.healthBar.x = Defs.LEFT_UI_BAR_WIDTH / 2;
             enemy.healthBar.y = Defs.GAME_HEIGHT * 0.16 * (i + 1);
 
-            let line = uiBarGroup.add(new Phaser.Sprite(game, 0, Defs.GAME_HEIGHT * 0.16 * (i + 1) + 23, 'blank'));
-            line.width = Defs.LEFT_UI_BAR_WIDTH;
-            line.height = 2 * Defs.MSR;
-            line.tint = 0x555555;
+            if (i < 2) {
+                let line = uiBarGroup.add(new Phaser.Sprite(game, 0, Defs.GAME_HEIGHT * 0.16 * (i + 1) + 23, 'blank'));
+                line.width = Defs.LEFT_UI_BAR_WIDTH;
+                line.height = 2 * Defs.MSR;
+                line.tint = 0x555555;
+            }
         }
+
+        actionButtonGroup = game.add.group()
+        itemButton = new Button(Defs.GAME_WIDTH * 0.85, Defs.GAME_HEIGHT - Defs.GAME_WIDTH * 0.15);
+        itemButton.sprite.addChild(new Phaser.Sprite(game, 0, -itemButton.sprite.height * 0.2, 'blank')).anchor.set(0.5);
+        itemButton.sprite.addChild(new Phaser.Text(game, 0, itemButton.sprite.height * 0.3, 'Item', labelTextStyle)).anchor.set(0.5);
+        skillButton = new Button(Defs.GAME_WIDTH * 0.85, itemButton.sprite.y - itemButton.sprite.height / 2 - Defs.GAME_WIDTH * 0.15);
+        skillButton.sprite.addChild(new Phaser.Sprite(game, 0, -skillButton.sprite.height * 0.2, 'blank')).anchor.set(0.5);
+        skillButton.sprite.addChild(new Phaser.Text(game, 0, skillButton.sprite.height * 0.3, 'Skill', labelTextStyle)).anchor.set(0.5);
+        attackButton = new Button(Defs.GAME_WIDTH * 0.85, skillButton.sprite.y - skillButton.sprite.height / 2 - Defs.GAME_WIDTH * 0.15);
+        attackButton.sprite.addChild(new Phaser.Sprite(game, 0, -attackButton.sprite.height * 0.2, 'blank')).anchor.set(0.5);
+        attackButton.sprite.addChild(new Phaser.Text(game, 0, attackButton.sprite.height * 0.3, 'Attack', labelTextStyle)).anchor.set(0.5);
+        itemButton.toggle = skillButton.toggle = attackButton.toggle = true;
+        itemButton.allowDepress = skillButton.allowDepress = attackButton.allowDepress = false;
+
+        selectGroup = game.add.group();
+        selectGroup.x = Defs.GAME_WIDTH * 0.3;
+        selectGroup.y = Defs.GAME_HEIGHT * 0.67;
+        var onChangeCallback = (select, button) => (pressed) => {
+            if (pressed) {
+                if (openedSelect) openedSelect.group.visible = false;
+                if (pressedButton) pressedButton.setPressed(false);
+                openedSelect = select;
+                openedSelect.group.visible = true;
+                pressedButton = button;
+            }
+        };
+
+        let weapons = State.items.filter((i) => i.type !== Defs.ITEM_TYPES.CONSUMABLE);
+        attackSelect = new RowSelectPopup(selectGroup, weapons.map((i) => ({
+            label: i.name, value: i.damage
+        })));
+        attackSelect.onSelect = (index) => {
+            selectedItem = weapons[index];
+            systemMessage.showText("Select a target");
+            openedSelect.group.visible = false;
+            pressedButton.setPressed(false);
+        };
+        attackSelect.group.visible = false;
+        attackButton.onChange = onChangeCallback(attackSelect, attackButton);
+
+        let skills = State.skills;
+        skillSelect = new RowSelectPopup(selectGroup, skills.map((s) => ({
+            label: s.name, value: s.mpCost
+        })));
+        skillSelect.onSelect = (index) => {
+            selectedItem = skills[index];
+            systemMessage.showText("Select a target");
+            openedSelect.group.visible = false;
+            pressedButton.setPressed(false);
+        };
+        skillSelect.group.visible = false;
+        skillButton.onChange = onChangeCallback(skillSelect, skillButton);
+
+        let items = State.items.filter((i) => i.type === Defs.ITEM_TYPES.CONSUMABLE);
+        itemSelect = new RowSelectPopup(selectGroup, items.map((i) => ({
+            label: i.name, value: ''
+        })));
+        itemSelect.onSelect = (index) => {
+            selectedItem = items[index];
+            openedSelect.group.visible = false;
+            pressedButton.setPressed(false);
+        };
+        itemSelect.group.visible = false;
+        itemButton.onChange = onChangeCallback(itemSelect, itemButton);
+
+        systemMessage = new SystemMessage();
+        let levelText = (State.level + 1) + (State.level % 10 === 0 && State.level !== 10? 'st': (State.level === 1? 'nd': (State.level === 2? 'rd':'th')));
+        systemMessage.showText(['You have reached the ' + levelText + ' floor.', 'Your turn!']);
     },
 
     update: () => {
+        attackSelect.update();
+        skillSelect.update();
+        itemSelect.update();
+
         if (combatDelayTimer <= 0) {
             let usedTurn = false;
             if (combatTurn === -1) {
                 // player's turn
-                let targetEnemy, targetEnemyPos;
-                let combatOver = true;
-                for (var p = 0; p < enemies.length; p++) {
-                    if (enemies[p]) {
-                        combatOver = false;
-                        if (enemies[p].sprite.input.justPressed()) {
-                            targetEnemyPos = p;
-                            targetEnemy = enemies[p];
-                            break;
+                if (selectedItem !== null && selectedItem.type === Defs.ITEM_TYPES.CONSUMABLE) {
+                    // use consumable
+                    usedTurn = true;
+                } else if (selectedItem !== null) {
+                    let targetEnemy, targetEnemyPos;
+                    let combatOver = true;
+                    for (var p = 0; p < enemies.length; p++) {
+                        if (enemies[p]) {
+                            combatOver = false;
+                            if (enemies[p].sprite.input.justPressed()) {
+                                targetEnemyPos = p;
+                                targetEnemy = enemies[p];
+                                break;
+                            }
                         }
                     }
-                }
 
-                if (targetEnemy) {
-                    usedTurn = true;
-                    combatDelayTimer = 1000; // delay next attack until animations are done
+                    if (targetEnemy) {
+                        usedTurn = true;
+                        combatDelayTimer = 1000; // delay next attack until animations are done
 
-                    player.attack(targetEnemy, () => {
-                        if (targetEnemy.health <= 0) {
-                            // KILL IT
-                            delete enemies[targetEnemyPos];
-                            enemies.splice(targetEnemyPos, 1);
-                            targetEnemy.sprite.destroy();
-                        }
-                    });
-                } else if (combatOver) {
-                    State.level++;
-                    game.state.restart(); // restart state with new level
+                        player.attack(targetEnemy, selectedItem.damage, () => {
+                            if (targetEnemy.health <= 0) {
+                                // KILL IT
+                                delete enemies[targetEnemyPos];
+                                enemies.splice(targetEnemyPos, 1);
+                                targetEnemy.sprite.destroy();
+
+                                systemMessage.showText("Killed monster!");
+                            } else {
+                                systemMessage.showText("Attacked monster for " + selectedItem.damage + "hp!");
+                            }
+                        });
+                    } else if (combatOver) {
+                        systemMessage.showText("Floor complete!");
+                        State.level++;
+                        game.state.restart(); // restart state with new level
+                    }
                 }
             } else {
                 // enemy's turn
@@ -118,7 +222,7 @@ export default {
                     combatDelayTimer = 1000; // delay next attack until animations are done
                     enemy.attack(player, () => {
                         if (player.health <= 0) {
-                            console.log("LOSE");
+                            systemMessage.showText("You lose!");
                         }
                     });
                 }
@@ -126,7 +230,10 @@ export default {
 
             if (usedTurn) {
                 combatTurn++;
-                if (combatTurn == enemies.length) combatTurn = -1; // reset to player's turn
+                if (combatTurn >= enemies.length) {
+                    combatTurn = -1; // reset to player's turn
+                    systemMessage.queueText("Your turn!");
+                }
             }
         } else if (combatDelayTimer > 0) {
             combatDelayTimer -= game.time.elapsed;

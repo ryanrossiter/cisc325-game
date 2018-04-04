@@ -60,25 +60,29 @@ export default {
                 label: 'DIFFICULTY',
                 prop: 'difficulty',
                 options: ['easy', 'medium', 'hard'],
-                labels: ['EZ', 'so-so', 'Crazy']
+                labels: ['EZ', 'so-so', 'Crazy'],
+                sprites: ['difficulty_ez', 'difficulty_soso', 'difficulty_crazy'],
             },
             {
                 label: 'CLASS',
                 prop: 'class',
                 options: ['warrior', 'mage', 'archer'],
-                labels: ['Warrior', 'Mage', 'Archer']
+                labels: ['Warrior', 'Mage', 'Archer'],
+                sprites: ['class_warrior', 'class_mage', 'class_archer'],
             },
             {
                 label: 'TYPE',
                 prop: 'type',
                 options: ['fire', 'water', 'elec', 'earth'],
-                labels: ['Fire', 'Water', 'Elec', 'Earth']
+                labels: ['Fire', 'Water', 'Elec', 'Earth'],
+                sprites: ['type_fire', 'type_water', 'type_elec', 'type_earth'],
             },
             {
                 label: 'FOCUS',
                 prop: 'focus',
                 options: ['phys', 'skill', 'buff', 'util'],
-                labels: ['Attack', 'Skill', 'Buff', 'Utility']
+                labels: ['Attack', 'Skill', 'Buff', 'Utility'],
+                sprites: ['focus_attack', 'focus_buff', 'focus_skill', 'focus_util'],
             }
         ];
 
@@ -109,7 +113,7 @@ export default {
                     }
                 };
 
-                btn.sprite.addChild(new Phaser.Sprite(game, 0, -btn.sprite.height * 0.2, 'blank')).anchor.set(0.5);
+                btn.sprite.addChild(new Phaser.Sprite(game, 0, -btn.sprite.height * 0.2, d.sprites[i])).anchor.set(0.5);
                 btn.sprite.addChild(new Phaser.Text(game, 0, btn.sprite.height * 0.3, d.labels[i], labelTextStyle)).anchor.set(0.5);
             }
         }

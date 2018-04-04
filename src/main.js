@@ -28,6 +28,7 @@ let systemMessage;
 let combatTurn;
 let player;
 let enemies;
+let remainingEnemies;
 let combatDelayTimer;
 let uiBarGroup;
 let actionButtonGroup;
@@ -42,6 +43,7 @@ export default {
         combatDelayTimer = COMBAT_START_DELAY;
 
         game.stage.backgroundColor = "#908077";
+        game.add.sprite(0, 0, 'background');
 
         //game.add.sprite(0, 0, 'test');
 
@@ -54,6 +56,7 @@ export default {
         for (var i = 0; i < level.enemies.length; i++) {
             enemies.push(new Enemy(Defs.LEFT_UI_BAR_WIDTH + xd * (i + 0.5), Defs.GAME_HEIGHT * 0.3 + yd * Math.pow(i, 1.8), level.enemies[i].type));
         }
+        remainingEnemies = enemies.length;
 
         uiBarGroup = game.add.group();
         var uiBarBg = uiBarGroup.add(new Phaser.Sprite(game, 0, 0, 'blank'));
@@ -62,8 +65,10 @@ export default {
         uiBarBg.tint = 0x999999;
 
         uiBarGroup.add(player.healthBar);
-        player.healthBar.x = Defs.LEFT_UI_BAR_WIDTH / 2;
-        player.healthBar.y = Defs.GAME_HEIGHT * 0.97;
+        uiBarGroup.add(player.manaBar);
+        player.healthBar.x = Defs.LEFT_UI_BAR_WIDTH / 3;
+        player.manaBar.x = Defs.LEFT_UI_BAR_WIDTH / 3 * 2;
+        player.healthBar.y = player.manaBar.y = Defs.GAME_HEIGHT * 0.97;
 
         uiBarGroup.add(new Phaser.Text(game,
             Defs.LEFT_UI_BAR_WIDTH / 2,
@@ -99,14 +104,17 @@ export default {
 
         actionButtonGroup = game.add.group()
         itemButton = new Button(Defs.GAME_WIDTH * 0.85, Defs.GAME_HEIGHT - Defs.GAME_WIDTH * 0.15);
-        itemButton.sprite.addChild(new Phaser.Sprite(game, 0, -itemButton.sprite.height * 0.2, 'blank')).anchor.set(0.5);
-        itemButton.sprite.addChild(new Phaser.Text(game, 0, itemButton.sprite.height * 0.3, 'Item', labelTextStyle)).anchor.set(0.5);
+        itemButton.sprite.loadTexture('item');
+        // itemButton.sprite.addChild(new Phaser.Sprite(game, 0, -itemButton.sprite.height * 0.2, 'blank')).anchor.set(0.5);
+        // itemButton.sprite.addChild(new Phaser.Text(game, 0, itemButton.sprite.height * 0.3, 'Item', labelTextStyle)).anchor.set(0.5);
         skillButton = new Button(Defs.GAME_WIDTH * 0.85, itemButton.sprite.y - itemButton.sprite.height / 2 - Defs.GAME_WIDTH * 0.15);
-        skillButton.sprite.addChild(new Phaser.Sprite(game, 0, -skillButton.sprite.height * 0.2, 'blank')).anchor.set(0.5);
-        skillButton.sprite.addChild(new Phaser.Text(game, 0, skillButton.sprite.height * 0.3, 'Skill', labelTextStyle)).anchor.set(0.5);
+        skillButton.sprite.loadTexture('magic');
+        // skillButton.sprite.addChild(new Phaser.Sprite(game, 0, -skillButton.sprite.height * 0.2, 'blank')).anchor.set(0.5);
+        // skillButton.sprite.addChild(new Phaser.Text(game, 0, skillButton.sprite.height * 0.3, 'Skill', labelTextStyle)).anchor.set(0.5);
         attackButton = new Button(Defs.GAME_WIDTH * 0.85, skillButton.sprite.y - skillButton.sprite.height / 2 - Defs.GAME_WIDTH * 0.15);
-        attackButton.sprite.addChild(new Phaser.Sprite(game, 0, -attackButton.sprite.height * 0.2, 'blank')).anchor.set(0.5);
-        attackButton.sprite.addChild(new Phaser.Text(game, 0, attackButton.sprite.height * 0.3, 'Attack', labelTextStyle)).anchor.set(0.5);
+        attackButton.sprite.loadTexture('attack');
+        // attackButton.sprite.addChild(new Phaser.Sprite(game, 0, -attackButton.sprite.height * 0.2, 'blank')).anchor.set(0.5);
+        // attackButton.sprite.addChild(new Phaser.Text(game, 0, attackButton.sprite.height * 0.3, 'Attack', labelTextStyle)).anchor.set(0.5);
         itemButton.toggle = skillButton.toggle = attackButton.toggle = true;
         itemButton.allowDepress = skillButton.allowDepress = attackButton.allowDepress = false;
 
@@ -129,7 +137,11 @@ export default {
         })));
         attackSelect.onSelect = (index) => {
             selectedItem = weapons[index];
-            systemMessage.showText("Select a target");
+            if (selectedItem.hasOwnProperty("mpCost") && selectedItem.mpCost > player.mana) {
+                systemMessage.showText("You do not have enough mana to use this skill");
+            } else {
+                systemMessage.showText("Select a target");
+            }
             openedSelect.group.visible = false;
             pressedButton.setPressed(false);
         };
@@ -142,7 +154,11 @@ export default {
         })));
         skillSelect.onSelect = (index) => {
             selectedItem = skills[index];
-            systemMessage.showText("Select a target");
+            if (selectedItem.mpCost > player.mana) {
+                systemMessage.showText("You do not have enough mana to use this skill");
+            } else {
+                systemMessage.showText("Select a target");
+            }
             openedSelect.group.visible = false;
             pressedButton.setPressed(false);
         };
@@ -173,17 +189,27 @@ export default {
 
         if (combatDelayTimer <= 0) {
             let usedTurn = false;
-            if (combatTurn === -1) {
+            if (remainingEnemies <= 0) {
+                systemMessage.showText("Floor complete!");
+                State.level++;
+                game.state.restart(); // restart state with new level
+            } else if (combatTurn === -1) {
                 // player's turn
-                if (selectedItem !== null && selectedItem.type === Defs.ITEM_TYPES.CONSUMABLE) {
-                    // use consumable
+                if (selectedItem !== null && (selectedItem.type === Defs.ITEM_TYPES.CONSUMABLE
+                    || (selectedItem.type === Defs.ITEM_TYPES.SKILL && !selectedItem.hasOwnProperty("damage")))) {
+                    // use consumable or non-attack skill
+                    if (selectedItem.hasOwnProperty("hpBuff")) {
+                        player.addHealth(selectedItem.hpBuff);
+                    }
                     usedTurn = true;
-                } else if (selectedItem !== null) {
+                    selectedItem = null;
+                } else if (selectedItem !== null
+                    && selectedItem.hasOwnProperty("damage")
+                    && (!selectedItem.hasOwnProperty("mpCost") || player.mana >= selectedItem.mpCost)) {
+
                     let targetEnemy, targetEnemyPos;
-                    let combatOver = true;
                     for (var p = 0; p < enemies.length; p++) {
                         if (enemies[p]) {
-                            combatOver = false;
                             if (enemies[p].sprite.input.justPressed()) {
                                 targetEnemyPos = p;
                                 targetEnemy = enemies[p];
@@ -196,22 +222,23 @@ export default {
                         usedTurn = true;
                         combatDelayTimer = 1000; // delay next attack until animations are done
 
+                        if (selectedItem.hasOwnProperty("mpCost")) {
+                            player.addMana(-selectedItem.mpCost);
+                        }
+
                         player.attack(targetEnemy, selectedItem.damage, () => {
                             if (targetEnemy.health <= 0) {
                                 // KILL IT
                                 delete enemies[targetEnemyPos];
                                 enemies.splice(targetEnemyPos, 1);
                                 targetEnemy.sprite.destroy();
+                                remainingEnemies--;
 
                                 systemMessage.showText("Killed monster!");
                             } else {
                                 systemMessage.showText("Attacked monster for " + selectedItem.damage + "hp!");
                             }
                         });
-                    } else if (combatOver) {
-                        systemMessage.showText("Floor complete!");
-                        State.level++;
-                        game.state.restart(); // restart state with new level
                     }
                 }
             } else {

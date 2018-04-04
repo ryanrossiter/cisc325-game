@@ -11,9 +11,7 @@ export default {
     
     preload: () => {
         // TODO: replace dummy sprites with actual sprites
-        Utils.CreateDummySprite('player', 350, 1000, "#99CF9A");
-        Utils.CreateDummySprite('enemy', 250, 240, "#D5999A");
-        Utils.CreateDummySprite('item', 140, 140, "#44764A");
+        Utils.CreateDummySprite('_item', 140, 140, "#44764A");
 
         Utils.CreateDummySprite('blank', 10, 10, "#FFFFFF");
 

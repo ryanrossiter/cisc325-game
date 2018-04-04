@@ -17,12 +17,16 @@ export default class Mob {
     }
 
     hit(dmg=1) {
-        this.health -= dmg;
-        this._healthBar.scale.y = 0.1 * Math.max(this.health / this.maxHealth, 0);
+        this.addHealth(-dmg);
         this.sprite.tint = 0xFF9090;
         setTimeout(() => { // forgive me pls for using a timeout
             this.sprite.tint = 0xFFFFFF; // reset tint
         }, 100);
+    }
+
+    addHealth(hp) {
+        this.health = Math.min(Math.max(this.health + hp, 0), this.maxHealth);
+        this._healthBar.scale.y = 0.1 * this.health / this.maxHealth;
     }
 
     attack(mob, dmg, onHit) {

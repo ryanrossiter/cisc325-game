@@ -45,13 +45,13 @@ export default {
         game.stage.backgroundColor = "#E5E5E5";
         game.world.setBounds(0, 0, Defs.GAME_WIDTH * 100, Defs.GAME_HEIGHT);
 
-        newGameButton = game.add.sprite(Defs.GAME_WIDTH * 0.05, Defs.GAME_HEIGHT * 0.025, game.cache.getBitmapData('newGameButton'));
-        continueButton = game.add.sprite(Defs.GAME_WIDTH * 0.05, Defs.GAME_HEIGHT * 0.45, game.cache.getBitmapData('continueButton'));
-        leaderboardButton = game.add.sprite(Defs.GAME_WIDTH * 0.05, Defs.GAME_HEIGHT * 0.875, game.cache.getBitmapData('leaderboardButton'));
+        newGameButton = game.add.sprite(Defs.GAME_WIDTH * 0.05, Defs.GAME_HEIGHT * 0.025, 'newgame');
+        continueButton = game.add.sprite(Defs.GAME_WIDTH * 0.05, Defs.GAME_HEIGHT * 0.45, 'continue');
+        leaderboardButton = game.add.sprite(Defs.GAME_WIDTH * 0.05, Defs.GAME_HEIGHT * 0.875, 'leaderboard');
 
-        newGameButton.addChild(new Phaser.Text(game, 50, 50, "New Game", outlineTextStyle));
-        continueButton.addChild(new Phaser.Text(game, 50, 50, "Continue", outlineTextStyle));
-        leaderboardButton.addChild(new Phaser.Text(game, 50, 50, "Leaderboard", outlineTextStyle));
+        // newGameButton.addChild(new Phaser.Text(game, 50, 50, "New Game", outlineTextStyle));
+        // continueButton.addChild(new Phaser.Text(game, 50, 50, "Continue", outlineTextStyle));
+        // leaderboardButton.addChild(new Phaser.Text(game, 50, 50, "Leaderboard", outlineTextStyle));
 
         newGameButton.inputEnabled = continueButton.inputEnabled = leaderboardButton.inputEnabled = true;
         newGameButton.events.onInputDown.add(() => {

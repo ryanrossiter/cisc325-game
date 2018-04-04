@@ -1,15 +1,17 @@
 import game from '../game';
 import Defs from '../defs';
-import InfoRow from './InfoRow';
+
+const WIDTH = Defs.GAME_WIDTH * 0.4;
+const HEIGHT = 100;
 
 const labelTextStyle = {
     "font": "Verdana",
     fill: "#111",
-    fontSize: "60px",
+    fontSize: "50px",
     boundsAlignV: 'middle',
-    fontWeight: "bold",
     wordWrap: true,
-    wordWrapWidth: InfoRow.WIDTH * 0.6
+    wordWrapWidth: WIDTH * 0.8,
+    maxLines: 2,
 };
 
 const valueTextStyle = {
@@ -18,9 +20,6 @@ const valueTextStyle = {
     fontSize: "55px",
     fontWeight: "bold"
 };
-
-const WIDTH = Defs.GAME_WIDTH * 0.4;
-const HEIGHT = 100;
 
 class SmallInfoRow {
     constructor(label, value) {

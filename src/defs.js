@@ -33,28 +33,28 @@ export default {
         HEALTH_POTION: {
             name: "Health Potion",
             type: ITEM_TYPES.CONSUMABLE,
-            sprite: 'item',
+            sprite: '_item',
             cost: 200,
             hpBuff: 75,
         },
         WOODEN_SWORD: {
             name: "Wooden Sword",
             type: ITEM_TYPES.MELEE,
-            sprite: 'item',
+            sprite: '_item',
             cost: 150,
             damage: 30,
         },
         STEEL_SWORD: {
             name: "Steel Sword",
             type: ITEM_TYPES.MELEE,
-            sprite: 'item',
+            sprite: '_item',
             cost: 400,
             damage: 50,
         },
         WAND: {
             name: "Wand",
             type: ITEM_TYPES.MAGIC,
-            sprite: 'item',
+            sprite: '_item',
             damage: 50,
             cost: 500,
             mpCost: 10,
@@ -63,15 +63,25 @@ export default {
             name: "Heal Buff",
             type: ITEM_TYPES.SKILL,
             desc: "Gain HP",
-            sprite: 'item',
-            cost: 5,
+            sprite: '_item',
+            cost: 10,
             mpCost: 10,
+            hpBuff: 50,
+        },
+        FLAME_THROW: {
+            name: "Flamethrow Spell",
+            type: ITEM_TYPES.SKILL,
+            desc: "Fire type magic atk",
+            sprite: '_item',
+            cost: 50,
+            mpCost: 50,
+            damage: 90,
         }
     },
 
     ENEMIES: {
         NORMAL: { // maybe add other stats like def?
-            sprite: 'enemy',
+            sprite: 'monster1',
             health: 90,
             damage: 10,
             drop_rates: {
@@ -81,9 +91,18 @@ export default {
             }
         },
         STRONGER: { // maybe add other stats like def?
-            sprite: 'enemy',
+            sprite: 'monster2',
             health: 150,
             damage: 25,
+            drop_rates: {
+                "STEEL_SWORD": 0.25,
+                "WAND": 0.1,
+            }
+        },
+        STRONGEST: { // maybe add other stats like def?
+            sprite: 'monster3',
+            health: 220,
+            damage: 33,
             drop_rates: {
                 "STEEL_SWORD": 0.25,
                 "WAND": 0.1,
@@ -105,7 +124,36 @@ export default {
             type: LEVEL_TYPES.NORMAL,
             enemies: [
                 { type: "NORMAL" },
-                { type: "STRONGER" }
+                { type: "STRONGER" },
+            ]
+        },
+        {
+            type: LEVEL_TYPES.NORMAL,
+            enemies: [
+                { type: "NORMAL" },
+                { type: "STRONGER" },
+                { type: "NORMAL" },
+            ]
+        },
+        {
+            type: LEVEL_TYPES.NORMAL,
+            enemies: [
+                { type: "STRONGEST" },
+            ]
+        },
+        {
+            type: LEVEL_TYPES.NORMAL,
+            enemies: [
+                { type: "STRONGER" },
+                { type: "STRONGER" },
+            ]
+        },
+        {
+            type: LEVEL_TYPES.NORMAL,
+            enemies: [
+                { type: "STRONGER" },
+                { type: "NORMAL" },
+                { type: "STRONGER" },
             ]
         }
     ],
@@ -120,6 +168,31 @@ export default {
 
     SPRITES: {
         'title': 'assets/img/title.png',
+        'player': 'assets/img/player.png',
+        'monster1': 'assets/img/monster1.png',
+        'monster2': 'assets/img/monster2.png',
+        'monster3': 'assets/img/monster3.png',
+        'background': 'assets/img/background.png',
+        'newgame': 'assets/img/newgame.png',
+        'continue': 'assets/img/continue.png',
+        'leaderboard': 'assets/img/leaderboard.png',
+        'difficulty_ez': 'assets/img/journey_select/difficulty_ez.png',
+        'difficulty_soso': 'assets/img/journey_select/difficulty_soso.png',
+        'difficulty_crazy': 'assets/img/journey_select/difficulty_crazy.png',
+        'class_warrior': 'assets/img/journey_select/class_warrior.png',
+        'class_mage': 'assets/img/journey_select/class_mage.png',
+        'class_archer': 'assets/img/journey_select/class_archer.png',
+        'type_fire': 'assets/img/journey_select/type_fire.png',
+        'type_water': 'assets/img/journey_select/type_water.png',
+        'type_elec': 'assets/img/journey_select/type_elec.png',
+        'type_earth': 'assets/img/journey_select/type_earth.png',
+        'focus_attack': 'assets/img/journey_select/focus_attack.png',
+        'focus_buff': 'assets/img/journey_select/focus_buff.png',
+        'focus_skill': 'assets/img/journey_select/focus_skill.png',
+        'focus_util': 'assets/img/journey_select/focus_util.png',
+        'attack': 'assets/img/attack.png',
+        'magic': 'assets/img/magic.png',
+        'item': 'assets/img/item.png',
     },
 
     PIXEL_SPRITES: {

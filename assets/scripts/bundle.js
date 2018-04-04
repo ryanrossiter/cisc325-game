@@ -154,28 +154,28 @@ const ITEM_TYPES = {
         HEALTH_POTION: {
             name: "Health Potion",
             type: ITEM_TYPES.CONSUMABLE,
-            sprite: 'item',
+            sprite: '_item',
             cost: 200,
             hpBuff: 75,
         },
         WOODEN_SWORD: {
             name: "Wooden Sword",
             type: ITEM_TYPES.MELEE,
-            sprite: 'item',
+            sprite: '_item',
             cost: 150,
             damage: 30,
         },
         STEEL_SWORD: {
             name: "Steel Sword",
             type: ITEM_TYPES.MELEE,
-            sprite: 'item',
+            sprite: '_item',
             cost: 400,
             damage: 50,
         },
         WAND: {
             name: "Wand",
             type: ITEM_TYPES.MAGIC,
-            sprite: 'item',
+            sprite: '_item',
             damage: 50,
             cost: 500,
             mpCost: 10,
@@ -184,15 +184,25 @@ const ITEM_TYPES = {
             name: "Heal Buff",
             type: ITEM_TYPES.SKILL,
             desc: "Gain HP",
-            sprite: 'item',
-            cost: 5,
+            sprite: '_item',
+            cost: 10,
             mpCost: 10,
+            hpBuff: 50,
+        },
+        FLAME_THROW: {
+            name: "Flamethrow Spell",
+            type: ITEM_TYPES.SKILL,
+            desc: "Fire type magic atk",
+            sprite: '_item',
+            cost: 50,
+            mpCost: 50,
+            damage: 90,
         }
     },
 
     ENEMIES: {
         NORMAL: { // maybe add other stats like def?
-            sprite: 'enemy',
+            sprite: 'monster1',
             health: 90,
             damage: 10,
             drop_rates: {
@@ -202,9 +212,18 @@ const ITEM_TYPES = {
             }
         },
         STRONGER: { // maybe add other stats like def?
-            sprite: 'enemy',
+            sprite: 'monster2',
             health: 150,
             damage: 25,
+            drop_rates: {
+                "STEEL_SWORD": 0.25,
+                "WAND": 0.1,
+            }
+        },
+        STRONGEST: { // maybe add other stats like def?
+            sprite: 'monster3',
+            health: 220,
+            damage: 33,
             drop_rates: {
                 "STEEL_SWORD": 0.25,
                 "WAND": 0.1,
@@ -226,7 +245,36 @@ const ITEM_TYPES = {
             type: LEVEL_TYPES.NORMAL,
             enemies: [
                 { type: "NORMAL" },
-                { type: "STRONGER" }
+                { type: "STRONGER" },
+            ]
+        },
+        {
+            type: LEVEL_TYPES.NORMAL,
+            enemies: [
+                { type: "NORMAL" },
+                { type: "STRONGER" },
+                { type: "NORMAL" },
+            ]
+        },
+        {
+            type: LEVEL_TYPES.NORMAL,
+            enemies: [
+                { type: "STRONGEST" },
+            ]
+        },
+        {
+            type: LEVEL_TYPES.NORMAL,
+            enemies: [
+                { type: "STRONGER" },
+                { type: "STRONGER" },
+            ]
+        },
+        {
+            type: LEVEL_TYPES.NORMAL,
+            enemies: [
+                { type: "STRONGER" },
+                { type: "NORMAL" },
+                { type: "STRONGER" },
             ]
         }
     ],
@@ -241,6 +289,31 @@ const ITEM_TYPES = {
 
     SPRITES: {
         'title': 'assets/img/title.png',
+        'player': 'assets/img/player.png',
+        'monster1': 'assets/img/monster1.png',
+        'monster2': 'assets/img/monster2.png',
+        'monster3': 'assets/img/monster3.png',
+        'background': 'assets/img/background.png',
+        'newgame': 'assets/img/newgame.png',
+        'continue': 'assets/img/continue.png',
+        'leaderboard': 'assets/img/leaderboard.png',
+        'difficulty_ez': 'assets/img/journey_select/difficulty_ez.png',
+        'difficulty_soso': 'assets/img/journey_select/difficulty_soso.png',
+        'difficulty_crazy': 'assets/img/journey_select/difficulty_crazy.png',
+        'class_warrior': 'assets/img/journey_select/class_warrior.png',
+        'class_mage': 'assets/img/journey_select/class_mage.png',
+        'class_archer': 'assets/img/journey_select/class_archer.png',
+        'type_fire': 'assets/img/journey_select/type_fire.png',
+        'type_water': 'assets/img/journey_select/type_water.png',
+        'type_elec': 'assets/img/journey_select/type_elec.png',
+        'type_earth': 'assets/img/journey_select/type_earth.png',
+        'focus_attack': 'assets/img/journey_select/focus_attack.png',
+        'focus_buff': 'assets/img/journey_select/focus_buff.png',
+        'focus_skill': 'assets/img/journey_select/focus_skill.png',
+        'focus_util': 'assets/img/journey_select/focus_util.png',
+        'attack': 'assets/img/attack.png',
+        'magic': 'assets/img/magic.png',
+        'item': 'assets/img/item.png',
     },
 
     PIXEL_SPRITES: {
@@ -344,62 +417,6 @@ const State = {
 
 /***/ }),
 /* 4 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__defs__ = __webpack_require__(1);
-
-
-
-const DESELECTED_BG_ALPHA = 0.05;
-const SELECTED_BG_ALPHA = 0.2;
-const WIDTH = __WEBPACK_IMPORTED_MODULE_1__defs__["a" /* default */].GAME_WIDTH * 0.9;
-const HEIGHT = 200;
-
-class InfoRow {
-    constructor(parentGroup, innerGroup, x, y) {
-        this.selected = false;
-
-        this.group = parentGroup.add(new Phaser.Group(__WEBPACK_IMPORTED_MODULE_0__game__["default"], null));
-        this.group.x = x;
-        this.group.y = y;
-        this.innerGroup = innerGroup;
-        this.innerGroup.x = -WIDTH / 2;
-
-        this.background = this.group.add(new Phaser.Sprite(__WEBPACK_IMPORTED_MODULE_0__game__["default"], this.innerGroup.x, 0, 'blank'));
-        this.background.width = WIDTH;
-        this.background.height = HEIGHT;
-        this.background.tint = 0x000000;
-        this.background.alpha = 0.05;
-
-        let borderBottom = this.group.add(new Phaser.Sprite(__WEBPACK_IMPORTED_MODULE_0__game__["default"], this.innerGroup.x, HEIGHT, 'blank'));
-        borderBottom.width = WIDTH;
-        borderBottom.height = __WEBPACK_IMPORTED_MODULE_1__defs__["a" /* default */].MSR;
-        borderBottom.tint = 0x777777
-
-        this.group.add(this.innerGroup);
-    }
-
-    setSelected(s) {
-        this.selected = s;
-        this.background.alpha = (this.selected? SELECTED_BG_ALPHA : DESELECTED_BG_ALPHA);
-    }
-
-    onInputUp() {
-        this.setSelected(!this.selected);
-    }
-}
-
-InfoRow.WIDTH = WIDTH;
-InfoRow.HEIGHT = HEIGHT;
-
-/* harmony default export */ __webpack_exports__["a"] = (InfoRow);
-
-
-
-/***/ }),
-/* 5 */
 /***/ (function(module, exports) {
 
 var g;
@@ -426,7 +443,7 @@ module.exports = g;
 
 
 /***/ }),
-/* 6 */
+/* 5 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -487,6 +504,62 @@ class Button {
 
 
 /***/ }),
+/* 6 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__defs__ = __webpack_require__(1);
+
+
+
+const DESELECTED_BG_ALPHA = 0.05;
+const SELECTED_BG_ALPHA = 0.2;
+const WIDTH = __WEBPACK_IMPORTED_MODULE_1__defs__["a" /* default */].GAME_WIDTH * 0.9;
+const HEIGHT = 200;
+
+class InfoRow {
+    constructor(parentGroup, innerGroup, x, y) {
+        this.selected = false;
+
+        this.group = parentGroup.add(new Phaser.Group(__WEBPACK_IMPORTED_MODULE_0__game__["default"], null));
+        this.group.x = x;
+        this.group.y = y;
+        this.innerGroup = innerGroup;
+        this.innerGroup.x = -WIDTH / 2;
+
+        this.background = this.group.add(new Phaser.Sprite(__WEBPACK_IMPORTED_MODULE_0__game__["default"], this.innerGroup.x, 0, 'blank'));
+        this.background.width = WIDTH;
+        this.background.height = HEIGHT;
+        this.background.tint = 0x000000;
+        this.background.alpha = 0.05;
+
+        let borderBottom = this.group.add(new Phaser.Sprite(__WEBPACK_IMPORTED_MODULE_0__game__["default"], this.innerGroup.x, HEIGHT, 'blank'));
+        borderBottom.width = WIDTH;
+        borderBottom.height = __WEBPACK_IMPORTED_MODULE_1__defs__["a" /* default */].MSR;
+        borderBottom.tint = 0x777777
+
+        this.group.add(this.innerGroup);
+    }
+
+    setSelected(s) {
+        this.selected = s;
+        this.background.alpha = (this.selected? SELECTED_BG_ALPHA : DESELECTED_BG_ALPHA);
+    }
+
+    onInputUp() {
+        this.setSelected(!this.selected);
+    }
+}
+
+InfoRow.WIDTH = WIDTH;
+InfoRow.HEIGHT = HEIGHT;
+
+/* harmony default export */ __webpack_exports__["a"] = (InfoRow);
+
+
+
+/***/ }),
 /* 7 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -512,12 +585,16 @@ class Mob {
     }
 
     hit(dmg=1) {
-        this.health -= dmg;
-        this._healthBar.scale.y = 0.1 * Math.max(this.health / this.maxHealth, 0);
+        this.addHealth(-dmg);
         this.sprite.tint = 0xFF9090;
         setTimeout(() => { // forgive me pls for using a timeout
             this.sprite.tint = 0xFFFFFF; // reset tint
         }, 100);
+    }
+
+    addHealth(hp) {
+        this.health = Math.min(Math.max(this.health + hp, 0), this.maxHealth);
+        this._healthBar.scale.y = 0.1 * this.health / this.maxHealth;
     }
 
     attack(mob, dmg, onHit) {
@@ -650,7 +727,7 @@ class GroupSwipe {
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__defs__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__InfoRow__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__InfoRow__ = __webpack_require__(6);
 
 
 
@@ -690,7 +767,7 @@ class ItemInfo {
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global) {module.exports = global["PIXI"] = __webpack_require__(11);
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
 
 /***/ }),
 /* 11 */
@@ -8261,7 +8338,7 @@ PIXI.TextureUvs = function()
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global) {module.exports = global["p2"] = __webpack_require__(13);
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
 
 /***/ }),
 /* 13 */
@@ -21895,7 +21972,7 @@ World.prototype.raycast = function(result, ray){
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global) {module.exports = global["Phaser"] = __webpack_require__(15);
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
 
 /***/ }),
 /* 15 */
@@ -108878,9 +108955,7 @@ let loadPromises = [];
     
     preload: () => {
         // TODO: replace dummy sprites with actual sprites
-        __WEBPACK_IMPORTED_MODULE_2__utils__["a" /* default */].CreateDummySprite('player', 350, 1000, "#99CF9A");
-        __WEBPACK_IMPORTED_MODULE_2__utils__["a" /* default */].CreateDummySprite('enemy', 250, 240, "#D5999A");
-        __WEBPACK_IMPORTED_MODULE_2__utils__["a" /* default */].CreateDummySprite('item', 140, 140, "#44764A");
+        __WEBPACK_IMPORTED_MODULE_2__utils__["a" /* default */].CreateDummySprite('_item', 140, 140, "#44764A");
 
         __WEBPACK_IMPORTED_MODULE_2__utils__["a" /* default */].CreateDummySprite('blank', 10, 10, "#FFFFFF");
 
@@ -108934,7 +109009,7 @@ let loadPromises = [];
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__utils__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__player__ = __webpack_require__(19);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__enemy__ = __webpack_require__(20);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__components_Button__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__components_Button__ = __webpack_require__(5);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__components_RowSelectPopup__ = __webpack_require__(21);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__components_ItemInfo__ = __webpack_require__(9);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__components_SystemMessage__ = __webpack_require__(23);
@@ -108968,6 +109043,7 @@ let systemMessage;
 let combatTurn;
 let player;
 let enemies;
+let remainingEnemies;
 let combatDelayTimer;
 let uiBarGroup;
 let actionButtonGroup;
@@ -108982,6 +109058,7 @@ let selectedItem = null;
         combatDelayTimer = COMBAT_START_DELAY;
 
         __WEBPACK_IMPORTED_MODULE_0__game__["default"].stage.backgroundColor = "#908077";
+        __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.sprite(0, 0, 'background');
 
         //game.add.sprite(0, 0, 'test');
 
@@ -108994,6 +109071,7 @@ let selectedItem = null;
         for (var i = 0; i < level.enemies.length; i++) {
             enemies.push(new __WEBPACK_IMPORTED_MODULE_5__enemy__["a" /* default */](__WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].LEFT_UI_BAR_WIDTH + xd * (i + 0.5), __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT * 0.3 + yd * Math.pow(i, 1.8), level.enemies[i].type));
         }
+        remainingEnemies = enemies.length;
 
         uiBarGroup = __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.group();
         var uiBarBg = uiBarGroup.add(new Phaser.Sprite(__WEBPACK_IMPORTED_MODULE_0__game__["default"], 0, 0, 'blank'));
@@ -109002,8 +109080,10 @@ let selectedItem = null;
         uiBarBg.tint = 0x999999;
 
         uiBarGroup.add(player.healthBar);
-        player.healthBar.x = __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].LEFT_UI_BAR_WIDTH / 2;
-        player.healthBar.y = __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT * 0.97;
+        uiBarGroup.add(player.manaBar);
+        player.healthBar.x = __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].LEFT_UI_BAR_WIDTH / 3;
+        player.manaBar.x = __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].LEFT_UI_BAR_WIDTH / 3 * 2;
+        player.healthBar.y = player.manaBar.y = __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT * 0.97;
 
         uiBarGroup.add(new Phaser.Text(__WEBPACK_IMPORTED_MODULE_0__game__["default"],
             __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].LEFT_UI_BAR_WIDTH / 2,
@@ -109039,14 +109119,17 @@ let selectedItem = null;
 
         actionButtonGroup = __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.group()
         itemButton = new __WEBPACK_IMPORTED_MODULE_6__components_Button__["a" /* default */](__WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH * 0.85, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT - __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH * 0.15);
-        itemButton.sprite.addChild(new Phaser.Sprite(__WEBPACK_IMPORTED_MODULE_0__game__["default"], 0, -itemButton.sprite.height * 0.2, 'blank')).anchor.set(0.5);
-        itemButton.sprite.addChild(new Phaser.Text(__WEBPACK_IMPORTED_MODULE_0__game__["default"], 0, itemButton.sprite.height * 0.3, 'Item', labelTextStyle)).anchor.set(0.5);
+        itemButton.sprite.loadTexture('item');
+        // itemButton.sprite.addChild(new Phaser.Sprite(game, 0, -itemButton.sprite.height * 0.2, 'blank')).anchor.set(0.5);
+        // itemButton.sprite.addChild(new Phaser.Text(game, 0, itemButton.sprite.height * 0.3, 'Item', labelTextStyle)).anchor.set(0.5);
         skillButton = new __WEBPACK_IMPORTED_MODULE_6__components_Button__["a" /* default */](__WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH * 0.85, itemButton.sprite.y - itemButton.sprite.height / 2 - __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH * 0.15);
-        skillButton.sprite.addChild(new Phaser.Sprite(__WEBPACK_IMPORTED_MODULE_0__game__["default"], 0, -skillButton.sprite.height * 0.2, 'blank')).anchor.set(0.5);
-        skillButton.sprite.addChild(new Phaser.Text(__WEBPACK_IMPORTED_MODULE_0__game__["default"], 0, skillButton.sprite.height * 0.3, 'Skill', labelTextStyle)).anchor.set(0.5);
+        skillButton.sprite.loadTexture('magic');
+        // skillButton.sprite.addChild(new Phaser.Sprite(game, 0, -skillButton.sprite.height * 0.2, 'blank')).anchor.set(0.5);
+        // skillButton.sprite.addChild(new Phaser.Text(game, 0, skillButton.sprite.height * 0.3, 'Skill', labelTextStyle)).anchor.set(0.5);
         attackButton = new __WEBPACK_IMPORTED_MODULE_6__components_Button__["a" /* default */](__WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH * 0.85, skillButton.sprite.y - skillButton.sprite.height / 2 - __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH * 0.15);
-        attackButton.sprite.addChild(new Phaser.Sprite(__WEBPACK_IMPORTED_MODULE_0__game__["default"], 0, -attackButton.sprite.height * 0.2, 'blank')).anchor.set(0.5);
-        attackButton.sprite.addChild(new Phaser.Text(__WEBPACK_IMPORTED_MODULE_0__game__["default"], 0, attackButton.sprite.height * 0.3, 'Attack', labelTextStyle)).anchor.set(0.5);
+        attackButton.sprite.loadTexture('attack');
+        // attackButton.sprite.addChild(new Phaser.Sprite(game, 0, -attackButton.sprite.height * 0.2, 'blank')).anchor.set(0.5);
+        // attackButton.sprite.addChild(new Phaser.Text(game, 0, attackButton.sprite.height * 0.3, 'Attack', labelTextStyle)).anchor.set(0.5);
         itemButton.toggle = skillButton.toggle = attackButton.toggle = true;
         itemButton.allowDepress = skillButton.allowDepress = attackButton.allowDepress = false;
 
@@ -109069,7 +109152,11 @@ let selectedItem = null;
         })));
         attackSelect.onSelect = (index) => {
             selectedItem = weapons[index];
-            systemMessage.showText("Select a target");
+            if (selectedItem.hasOwnProperty("mpCost") && selectedItem.mpCost > player.mana) {
+                systemMessage.showText("You do not have enough mana to use this skill");
+            } else {
+                systemMessage.showText("Select a target");
+            }
             openedSelect.group.visible = false;
             pressedButton.setPressed(false);
         };
@@ -109082,7 +109169,11 @@ let selectedItem = null;
         })));
         skillSelect.onSelect = (index) => {
             selectedItem = skills[index];
-            systemMessage.showText("Select a target");
+            if (selectedItem.mpCost > player.mana) {
+                systemMessage.showText("You do not have enough mana to use this skill");
+            } else {
+                systemMessage.showText("Select a target");
+            }
             openedSelect.group.visible = false;
             pressedButton.setPressed(false);
         };
@@ -109113,17 +109204,27 @@ let selectedItem = null;
 
         if (combatDelayTimer <= 0) {
             let usedTurn = false;
-            if (combatTurn === -1) {
+            if (remainingEnemies <= 0) {
+                systemMessage.showText("Floor complete!");
+                __WEBPACK_IMPORTED_MODULE_1__state__["a" /* default */].level++;
+                __WEBPACK_IMPORTED_MODULE_0__game__["default"].state.restart(); // restart state with new level
+            } else if (combatTurn === -1) {
                 // player's turn
-                if (selectedItem !== null && selectedItem.type === __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].ITEM_TYPES.CONSUMABLE) {
-                    // use consumable
+                if (selectedItem !== null && (selectedItem.type === __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].ITEM_TYPES.CONSUMABLE
+                    || (selectedItem.type === __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].ITEM_TYPES.SKILL && !selectedItem.hasOwnProperty("damage")))) {
+                    // use consumable or non-attack skill
+                    if (selectedItem.hasOwnProperty("hpBuff")) {
+                        player.addHealth(selectedItem.hpBuff);
+                    }
                     usedTurn = true;
-                } else if (selectedItem !== null) {
+                    selectedItem = null;
+                } else if (selectedItem !== null
+                    && selectedItem.hasOwnProperty("damage")
+                    && (!selectedItem.hasOwnProperty("mpCost") || player.mana >= selectedItem.mpCost)) {
+
                     let targetEnemy, targetEnemyPos;
-                    let combatOver = true;
                     for (var p = 0; p < enemies.length; p++) {
                         if (enemies[p]) {
-                            combatOver = false;
                             if (enemies[p].sprite.input.justPressed()) {
                                 targetEnemyPos = p;
                                 targetEnemy = enemies[p];
@@ -109136,22 +109237,23 @@ let selectedItem = null;
                         usedTurn = true;
                         combatDelayTimer = 1000; // delay next attack until animations are done
 
+                        if (selectedItem.hasOwnProperty("mpCost")) {
+                            player.addMana(-selectedItem.mpCost);
+                        }
+
                         player.attack(targetEnemy, selectedItem.damage, () => {
                             if (targetEnemy.health <= 0) {
                                 // KILL IT
                                 delete enemies[targetEnemyPos];
                                 enemies.splice(targetEnemyPos, 1);
                                 targetEnemy.sprite.destroy();
+                                remainingEnemies--;
 
                                 systemMessage.showText("Killed monster!");
                             } else {
                                 systemMessage.showText("Attacked monster for " + selectedItem.damage + "hp!");
                             }
                         });
-                    } else if (combatOver) {
-                        systemMessage.showText("Floor complete!");
-                        __WEBPACK_IMPORTED_MODULE_1__state__["a" /* default */].level++;
-                        __WEBPACK_IMPORTED_MODULE_0__game__["default"].state.restart(); // restart state with new level
                     }
                 }
             } else {
@@ -109200,11 +109302,25 @@ const HEALTH_BAR_HEIGHT = __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */]
 class Player extends __WEBPACK_IMPORTED_MODULE_3__mob__["a" /* default */] {
     constructor(x, y) {
         super(200);
+        this.maxMana = this.mana = 100;
 
         this.sprite = __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.sprite(x, y, 'player');
         this.sprite.anchor.set(0.5, 1); // set sprite anchor at feet
         this.healthBar.scale.y = HEALTH_BAR_HEIGHT;
         //this.sprite.addChild(this.healthBar);
+
+        this.manaBar = __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.group(null);
+        this._manaBar = this.manaBar.add(new Phaser.Sprite(__WEBPACK_IMPORTED_MODULE_0__game__["default"], 0, 0, 'blank'));
+        this._manaBar.height = 1;
+        this._manaBar.width = 40;
+        this._manaBar.tint = 0x0000FF;
+        this._manaBar.anchor.set(0.5, 1);
+        this.manaBar.scale.y = HEALTH_BAR_HEIGHT;
+    }
+
+    addMana(m) {
+        this.mana = Math.max(Math.min(this.mana + m, this.maxMana), 0);
+        this._manaBar.scale.y = 0.1 * this.mana / this.maxMana;
     }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = Player;
@@ -109305,19 +109421,20 @@ class RowSelectPopup {
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__defs__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__InfoRow__ = __webpack_require__(4);
 
 
 
+const WIDTH = __WEBPACK_IMPORTED_MODULE_1__defs__["a" /* default */].GAME_WIDTH * 0.4;
+const HEIGHT = 100;
 
 const labelTextStyle = {
     "font": "Verdana",
     fill: "#111",
-    fontSize: "60px",
+    fontSize: "50px",
     boundsAlignV: 'middle',
-    fontWeight: "bold",
     wordWrap: true,
-    wordWrapWidth: __WEBPACK_IMPORTED_MODULE_2__InfoRow__["a" /* default */].WIDTH * 0.6
+    wordWrapWidth: WIDTH * 0.8,
+    maxLines: 2,
 };
 
 const valueTextStyle = {
@@ -109326,9 +109443,6 @@ const valueTextStyle = {
     fontSize: "55px",
     fontWeight: "bold"
 };
-
-const WIDTH = __WEBPACK_IMPORTED_MODULE_1__defs__["a" /* default */].GAME_WIDTH * 0.4;
-const HEIGHT = 100;
 
 class SmallInfoRow {
     constructor(label, value) {
@@ -109476,13 +109590,13 @@ const outlineTextStyle = {
         __WEBPACK_IMPORTED_MODULE_0__game__["default"].stage.backgroundColor = "#E5E5E5";
         __WEBPACK_IMPORTED_MODULE_0__game__["default"].world.setBounds(0, 0, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH * 100, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT);
 
-        newGameButton = __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.sprite(__WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH * 0.05, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT * 0.025, __WEBPACK_IMPORTED_MODULE_0__game__["default"].cache.getBitmapData('newGameButton'));
-        continueButton = __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.sprite(__WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH * 0.05, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT * 0.45, __WEBPACK_IMPORTED_MODULE_0__game__["default"].cache.getBitmapData('continueButton'));
-        leaderboardButton = __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.sprite(__WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH * 0.05, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT * 0.875, __WEBPACK_IMPORTED_MODULE_0__game__["default"].cache.getBitmapData('leaderboardButton'));
+        newGameButton = __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.sprite(__WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH * 0.05, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT * 0.025, 'newgame');
+        continueButton = __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.sprite(__WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH * 0.05, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT * 0.45, 'continue');
+        leaderboardButton = __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.sprite(__WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH * 0.05, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT * 0.875, 'leaderboard');
 
-        newGameButton.addChild(new Phaser.Text(__WEBPACK_IMPORTED_MODULE_0__game__["default"], 50, 50, "New Game", outlineTextStyle));
-        continueButton.addChild(new Phaser.Text(__WEBPACK_IMPORTED_MODULE_0__game__["default"], 50, 50, "Continue", outlineTextStyle));
-        leaderboardButton.addChild(new Phaser.Text(__WEBPACK_IMPORTED_MODULE_0__game__["default"], 50, 50, "Leaderboard", outlineTextStyle));
+        // newGameButton.addChild(new Phaser.Text(game, 50, 50, "New Game", outlineTextStyle));
+        // continueButton.addChild(new Phaser.Text(game, 50, 50, "Continue", outlineTextStyle));
+        // leaderboardButton.addChild(new Phaser.Text(game, 50, 50, "Leaderboard", outlineTextStyle));
 
         newGameButton.inputEnabled = continueButton.inputEnabled = leaderboardButton.inputEnabled = true;
         newGameButton.events.onInputDown.add(() => {
@@ -109595,9 +109709,9 @@ class NameDialog {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__state__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__defs__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__utils__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__components_Button__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__components_Button__ = __webpack_require__(5);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__components_GroupSwipe__ = __webpack_require__(8);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__components_InfoRow__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__components_InfoRow__ = __webpack_require__(6);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__components_ItemInfo__ = __webpack_require__(9);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__components_SkillInfo__ = __webpack_require__(27);
 
@@ -109788,7 +109902,7 @@ let remainingSp;
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__defs__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__InfoRow__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__InfoRow__ = __webpack_require__(6);
 
 
 
@@ -109832,7 +109946,7 @@ class SkillInfo {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__state__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__defs__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__utils__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__components_Button__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__components_Button__ = __webpack_require__(5);
 
 
 
@@ -109895,25 +110009,29 @@ const continueTextStyle = {
                 label: 'DIFFICULTY',
                 prop: 'difficulty',
                 options: ['easy', 'medium', 'hard'],
-                labels: ['EZ', 'so-so', 'Crazy']
+                labels: ['EZ', 'so-so', 'Crazy'],
+                sprites: ['difficulty_ez', 'difficulty_soso', 'difficulty_crazy'],
             },
             {
                 label: 'CLASS',
                 prop: 'class',
                 options: ['warrior', 'mage', 'archer'],
-                labels: ['Warrior', 'Mage', 'Archer']
+                labels: ['Warrior', 'Mage', 'Archer'],
+                sprites: ['class_warrior', 'class_mage', 'class_archer'],
             },
             {
                 label: 'TYPE',
                 prop: 'type',
                 options: ['fire', 'water', 'elec', 'earth'],
-                labels: ['Fire', 'Water', 'Elec', 'Earth']
+                labels: ['Fire', 'Water', 'Elec', 'Earth'],
+                sprites: ['type_fire', 'type_water', 'type_elec', 'type_earth'],
             },
             {
                 label: 'FOCUS',
                 prop: 'focus',
                 options: ['phys', 'skill', 'buff', 'util'],
-                labels: ['Attack', 'Skill', 'Buff', 'Utility']
+                labels: ['Attack', 'Skill', 'Buff', 'Utility'],
+                sprites: ['focus_attack', 'focus_buff', 'focus_skill', 'focus_util'],
             }
         ];
 
@@ -109944,7 +110062,7 @@ const continueTextStyle = {
                     }
                 };
 
-                btn.sprite.addChild(new Phaser.Sprite(__WEBPACK_IMPORTED_MODULE_0__game__["default"], 0, -btn.sprite.height * 0.2, 'blank')).anchor.set(0.5);
+                btn.sprite.addChild(new Phaser.Sprite(__WEBPACK_IMPORTED_MODULE_0__game__["default"], 0, -btn.sprite.height * 0.2, d.sprites[i])).anchor.set(0.5);
                 btn.sprite.addChild(new Phaser.Text(__WEBPACK_IMPORTED_MODULE_0__game__["default"], 0, btn.sprite.height * 0.3, d.labels[i], labelTextStyle)).anchor.set(0.5);
             }
         }

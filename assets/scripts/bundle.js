@@ -109493,7 +109493,7 @@ const messageTextStyle = {
 class SystemMessage {
     constructor(item) {
         this.text = __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.text(__WEBPACK_IMPORTED_MODULE_1__defs__["a" /* default */].LEFT_UI_BAR_WIDTH, 0, '', messageTextStyle)
-            .setTextBounds(0, __WEBPACK_IMPORTED_MODULE_1__defs__["a" /* default */].GAME_HEIGHT * 0.1, messageTextStyle.wordWrapWidth, 300);
+            .setTextBounds(0, __WEBPACK_IMPORTED_MODULE_1__defs__["a" /* default */].GAME_HEIGHT * 0.45, messageTextStyle.wordWrapWidth, 300);
         this.text.alpha = 0;
 
         this.textQueue = [];
@@ -109590,9 +109590,9 @@ const outlineTextStyle = {
         __WEBPACK_IMPORTED_MODULE_0__game__["default"].stage.backgroundColor = "#E5E5E5";
         __WEBPACK_IMPORTED_MODULE_0__game__["default"].world.setBounds(0, 0, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH * 100, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT);
 
-        newGameButton = __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.sprite(__WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH * 0.05, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT * 0.025, 'newgame');
-        continueButton = __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.sprite(__WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH * 0.05, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT * 0.45, 'continue');
-        leaderboardButton = __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.sprite(__WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_WIDTH * 0.05, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT * 0.875, 'leaderboard');
+        newGameButton = __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.sprite(0, 0, 'newgame');
+        continueButton = __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.sprite(0, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT * 0.5, 'continue');
+        leaderboardButton = __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.sprite(0, __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].GAME_HEIGHT * 0.915, 'leaderboard');
 
         // newGameButton.addChild(new Phaser.Text(game, 50, 50, "New Game", outlineTextStyle));
         // continueButton.addChild(new Phaser.Text(game, 50, 50, "Continue", outlineTextStyle));

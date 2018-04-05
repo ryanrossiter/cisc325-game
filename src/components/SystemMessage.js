@@ -14,7 +14,7 @@ const messageTextStyle = {
 export default class SystemMessage {
     constructor(item) {
         this.text = game.add.text(Defs.LEFT_UI_BAR_WIDTH, 0, '', messageTextStyle)
-            .setTextBounds(0, Defs.GAME_HEIGHT * 0.1, messageTextStyle.wordWrapWidth, 300);
+            .setTextBounds(0, Defs.GAME_HEIGHT * 0.5, messageTextStyle.wordWrapWidth, 300);
         this.text.alpha = 0;
 
         this.textQueue = [];

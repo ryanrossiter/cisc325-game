@@ -158,6 +158,13 @@ const ITEM_TYPES = {
             cost: 200,
             hpBuff: 75,
         },
+        MANA_POTION: {
+            name: "Mana Potion",
+            type: ITEM_TYPES.CONSUMABLE,
+            sprite: '_item',
+            cost: 150,
+            mpBuff: 50,
+        },
         WOODEN_SWORD: {
             name: "Wooden Sword",
             type: ITEM_TYPES.MELEE,
@@ -180,6 +187,14 @@ const ITEM_TYPES = {
             cost: 500,
             mpCost: 10,
         },
+        STAFF: {
+            name: "Staff",
+            type: ITEM_TYPES.MAGIC,
+            sprite: '_item',
+            damage: 70,
+            cost: 600,
+            mpCost: 17,
+        },
         HEAL_BUFF: {
             name: "Heal Buff",
             type: ITEM_TYPES.SKILL,
@@ -188,6 +203,15 @@ const ITEM_TYPES = {
             cost: 10,
             mpCost: 10,
             hpBuff: 50,
+        },
+        LIGHTNING_BOLT: {
+            name: "Lightning Bolt",
+            type: ITEM_TYPES.SKILL,
+            desc: "Elec type magic atk",
+            sprite: '_item',
+            cost: 40,
+            mpCost: 30,
+            damage: 50,
         },
         FLAME_THROW: {
             name: "Flamethrow Spell",
@@ -276,7 +300,43 @@ const ITEM_TYPES = {
                 { type: "NORMAL" },
                 { type: "STRONGER" },
             ]
-        }
+        },
+        {
+            type: LEVEL_TYPES.NORMAL,
+            enemies: [
+                { type: "NORMAL" },
+                { type: "STRONGEST" },
+                { type: "NORMAL" },
+            ]
+        },
+        {
+            type: LEVEL_TYPES.NORMAL,
+            enemies: [
+                { type: "STRONGER" },
+                { type: "STRONGEST" },
+            ]
+        },
+        {
+            type: LEVEL_TYPES.NORMAL,
+            enemies: [
+                { type: "STRONGER" },
+                { type: "STRONGER" },
+                { type: "STRONGER" },
+            ]
+        },
+        {
+            type: LEVEL_TYPES.NORMAL,
+            enemies: [
+                { type: "NORMAL" },
+            ]
+        },
+        {
+            type: LEVEL_TYPES.NORMAL,
+            enemies: [
+                { type: "STRONGEST" },
+                { type: "STRONGEST" },
+            ]
+        },
     ],
 
     SPRITESHEETS: {
@@ -590,6 +650,17 @@ class Mob {
         setTimeout(() => { // forgive me pls for using a timeout
             this.sprite.tint = 0xFFFFFF; // reset tint
         }, 100);
+
+        let dmgMessage = __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.text(this.sprite.x, this.sprite.y - this.sprite.height, ~~dmg, {
+            "font": "Verdana",
+            fill: "#DD0000",
+            fontSize: "100px",
+            fontWeight: "bold"
+        });
+        dmgMessage.anchor.set(0.5, 1);
+        let tween = __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.tween(dmgMessage).to({ alpha: 0, y: '-100' }).start().onComplete.add(() => {
+            dmgMessage.destroy();
+        });
     }
 
     addHealth(hp) {
@@ -109215,6 +109286,8 @@ let selectedItem = null;
                     // use consumable or non-attack skill
                     if (selectedItem.hasOwnProperty("hpBuff")) {
                         player.addHealth(selectedItem.hpBuff);
+                    } else if (selectedItem.hasOwnProperty("mpBuff")) {
+                        player.addMana(selectedItem.mpBuff);
                     }
                     usedTurn = true;
                     selectedItem = null;
@@ -109301,8 +109374,8 @@ const HEALTH_BAR_HEIGHT = __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */]
 
 class Player extends __WEBPACK_IMPORTED_MODULE_3__mob__["a" /* default */] {
     constructor(x, y) {
-        super(200);
-        this.maxMana = this.mana = 100;
+        super(200 * Math.pow(1.1, __WEBPACK_IMPORTED_MODULE_1__state__["a" /* default */].level));
+        this.maxMana = this.mana = 100 * Math.pow(1.05, __WEBPACK_IMPORTED_MODULE_1__state__["a" /* default */].level);
 
         this.sprite = __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.sprite(x, y, 'player');
         this.sprite.anchor.set(0.5, 1); // set sprite anchor at feet
@@ -109343,7 +109416,8 @@ class Player extends __WEBPACK_IMPORTED_MODULE_3__mob__["a" /* default */] {
 class Enemy extends __WEBPACK_IMPORTED_MODULE_3__mob__["a" /* default */] {
     constructor(x, y, type) {
         let DATA = __WEBPACK_IMPORTED_MODULE_2__defs__["a" /* default */].ENEMIES[type];
-        super(DATA.health)
+        let healthMul = (__WEBPACK_IMPORTED_MODULE_1__state__["a" /* default */].difficulty === 'easy'? 1 : (__WEBPACK_IMPORTED_MODULE_1__state__["a" /* default */].difficulty === 'medium'? 1.2 : 1.5))
+        super(DATA.health * healthMul * Math.pow(1.05, __WEBPACK_IMPORTED_MODULE_1__state__["a" /* default */].level))
         this.DATA = DATA;
 
         this.sprite = __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.sprite(x, y, DATA.sprite);

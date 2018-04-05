@@ -47,7 +47,7 @@ export default {
 
         newGameButton = game.add.sprite(0, 0, 'newgame');
         continueButton = game.add.sprite(0, Defs.GAME_HEIGHT * 0.5, 'continue');
-        leaderboardButton = game.add.sprite(0, Defs.GAME_HEIGHT * 0.95, 'leaderboard');
+        leaderboardButton = game.add.sprite(0, Defs.GAME_HEIGHT * 0.9, 'leaderboard');
 
         // newGameButton.addChild(new Phaser.Text(game, 50, 50, "New Game", outlineTextStyle));
         // continueButton.addChild(new Phaser.Text(game, 50, 50, "Continue", outlineTextStyle));

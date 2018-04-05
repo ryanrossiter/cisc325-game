@@ -200,6 +200,8 @@ export default {
                     // use consumable or non-attack skill
                     if (selectedItem.hasOwnProperty("hpBuff")) {
                         player.addHealth(selectedItem.hpBuff);
+                    } else if (selectedItem.hasOwnProperty("mpBuff")) {
+                        player.addMana(selectedItem.mpBuff);
                     }
                     usedTurn = true;
                     selectedItem = null;

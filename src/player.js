@@ -7,8 +7,8 @@ const HEALTH_BAR_HEIGHT = Defs.GAME_HEIGHT * 0.4;
 
 export default class Player extends Mob {
     constructor(x, y) {
-        super(200);
-        this.maxMana = this.mana = 100;
+        super(200 * Math.pow(1.1, State.level));
+        this.maxMana = this.mana = 100 * Math.pow(1.05, State.level);
 
         this.sprite = game.add.sprite(x, y, 'player');
         this.sprite.anchor.set(0.5, 1); // set sprite anchor at feet

@@ -37,6 +37,13 @@ export default {
             cost: 200,
             hpBuff: 75,
         },
+        MANA_POTION: {
+            name: "Mana Potion",
+            type: ITEM_TYPES.CONSUMABLE,
+            sprite: '_item',
+            cost: 150,
+            mpBuff: 50,
+        },
         WOODEN_SWORD: {
             name: "Wooden Sword",
             type: ITEM_TYPES.MELEE,
@@ -59,6 +66,14 @@ export default {
             cost: 500,
             mpCost: 10,
         },
+        STAFF: {
+            name: "Staff",
+            type: ITEM_TYPES.MAGIC,
+            sprite: '_item',
+            damage: 70,
+            cost: 600,
+            mpCost: 17,
+        },
         HEAL_BUFF: {
             name: "Heal Buff",
             type: ITEM_TYPES.SKILL,
@@ -67,6 +82,15 @@ export default {
             cost: 10,
             mpCost: 10,
             hpBuff: 50,
+        },
+        LIGHTNING_BOLT: {
+            name: "Lightning Bolt",
+            type: ITEM_TYPES.SKILL,
+            desc: "Elec type magic atk",
+            sprite: '_item',
+            cost: 40,
+            mpCost: 30,
+            damage: 50,
         },
         FLAME_THROW: {
             name: "Flamethrow Spell",
@@ -155,7 +179,43 @@ export default {
                 { type: "NORMAL" },
                 { type: "STRONGER" },
             ]
-        }
+        },
+        {
+            type: LEVEL_TYPES.NORMAL,
+            enemies: [
+                { type: "NORMAL" },
+                { type: "STRONGEST" },
+                { type: "NORMAL" },
+            ]
+        },
+        {
+            type: LEVEL_TYPES.NORMAL,
+            enemies: [
+                { type: "STRONGER" },
+                { type: "STRONGEST" },
+            ]
+        },
+        {
+            type: LEVEL_TYPES.NORMAL,
+            enemies: [
+                { type: "STRONGER" },
+                { type: "STRONGER" },
+                { type: "STRONGER" },
+            ]
+        },
+        {
+            type: LEVEL_TYPES.NORMAL,
+            enemies: [
+                { type: "NORMAL" },
+            ]
+        },
+        {
+            type: LEVEL_TYPES.NORMAL,
+            enemies: [
+                { type: "STRONGEST" },
+                { type: "STRONGEST" },
+            ]
+        },
     ],
 
     SPRITESHEETS: {

@@ -22,6 +22,17 @@ export default class Mob {
         setTimeout(() => { // forgive me pls for using a timeout
             this.sprite.tint = 0xFFFFFF; // reset tint
         }, 100);
+
+        let dmgMessage = game.add.text(this.sprite.x, this.sprite.y - this.sprite.height, ~~dmg, {
+            "font": "Verdana",
+            fill: "#DD0000",
+            fontSize: "100px",
+            fontWeight: "bold"
+        });
+        dmgMessage.anchor.set(0.5, 1);
+        let tween = game.add.tween(dmgMessage).to({ alpha: 0, y: '-100' }).start().onComplete.add(() => {
+            dmgMessage.destroy();
+        });
     }
 
     addHealth(hp) {

@@ -109298,7 +109298,7 @@ let selectedItem = null;
                     let targetEnemy, targetEnemyPos;
                     for (var p = 0; p < enemies.length; p++) {
                         if (enemies[p]) {
-                            if (enemies[p].sprite.input.justPressed()) {
+                            if (enemies[p].sprite.input.isDragged) {
                                 targetEnemyPos = p;
                                 targetEnemy = enemies[p];
                                 break;
@@ -109423,6 +109423,8 @@ class Enemy extends __WEBPACK_IMPORTED_MODULE_3__mob__["a" /* default */] {
         this.sprite = __WEBPACK_IMPORTED_MODULE_0__game__["default"].add.sprite(x, y, DATA.sprite);
         this.sprite.anchor.set(0.5, 1);
         this.sprite.inputEnabled = true;
+        this.sprite.input.enableDrag();
+        this.sprite.input.setDragLock(false, false);
 
         //this.sprite.addChild(this.healthBar);
     }

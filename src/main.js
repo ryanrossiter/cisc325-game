@@ -212,7 +212,7 @@ export default {
                     let targetEnemy, targetEnemyPos;
                     for (var p = 0; p < enemies.length; p++) {
                         if (enemies[p]) {
-                            if (enemies[p].sprite.input.justPressed()) {
+                            if (enemies[p].sprite.input.isDragged) {
                                 targetEnemyPos = p;
                                 targetEnemy = enemies[p];
                                 break;

@@ -13,6 +13,8 @@ export default class Enemy extends Mob {
         this.sprite = game.add.sprite(x, y, DATA.sprite);
         this.sprite.anchor.set(0.5, 1);
         this.sprite.inputEnabled = true;
+        this.sprite.input.enableDrag();
+        this.sprite.input.setDragLock(false, false);
 
         //this.sprite.addChild(this.healthBar);
     }
